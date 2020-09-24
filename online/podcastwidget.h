@@ -49,7 +49,7 @@ private Q_SLOTS:
     void deleteDownload();
     void markAsNew();
     void markAsListened();
-    //void showUnplayedOnly(bool on);
+    void showUnplayedOnly(bool on);
     void configure();
     void exportSubscriptions();
     void refreshPodcast();
@@ -70,7 +70,7 @@ private:
     Action *cancelDownloadAction;
     Action *markAsNewAction;
     Action *markAsListenedAction;
-    //Action *unplayedOnlyAction;
+    Action *unplayedOnlyAction;
     Action *exportAction;
 };
 

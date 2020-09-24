@@ -142,8 +142,8 @@
     genre so that no tracks will match rules.
 36. Add a checkbox controlling whether Cantata should apply its replaygain
     setting each time it connects to MPD. Issue #1531
-37. Remove 'Show Unplayed Only' podcasts action, reported to cause crash when
-    refreshing lists.
+--37. Remove 'Show Unplayed Only' podcasts action, reported to cause crash when
+--    refreshing lists.
 38. Remove zooming from context view.
 39. When adding a stream to the play queue, encode name using #StreamName:name
     and not just #name - as MPD 0.22 uses this for #icy-metadata
