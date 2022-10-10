@@ -30,7 +30,7 @@
 
 #include "soliddefs_p.h"
 
-SOLID_GLOBAL_STATIC(Solid::DeviceManagerStorage, globalDeviceStorage)
+Q_GLOBAL_STATIC(Solid::DeviceManagerStorage, globalDeviceStorage)
 
 #if QT_VERSION < 0x050000
 #define QtPointer QWeakPointer
