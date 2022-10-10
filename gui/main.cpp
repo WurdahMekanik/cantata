@@ -23,7 +23,7 @@
 
 #include "application.h"
 #include <QTranslator>
-#include <QTextCodec>
+// #include <QTextCodec>
 #include <QLibraryInfo>
 #include <QDir>
 #include <QFile>
