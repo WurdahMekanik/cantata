@@ -144,7 +144,8 @@ QVariantMap DeviceBackend::allProperties() const
         QDBusPendingReply<QVariantMap> reply = QDBusConnection::systemBus().call(call);
 
         if (reply.isValid()) {
-            m_propertyCache.unite(reply.value());
+            // $$$ NOTE: this used to be a call to QMultiMap::unite(), so could be broken now.
+            m_propertyCache.insert(reply.value());
         } else {
             qWarning() << "Error getting props:" << reply.error().name() << reply.error().message();
         }
@@ -161,8 +162,7 @@ void DeviceBackend::invalidateProperties()
 
 QString DeviceBackend::introspect() const
 {
-    QDBusMessage call = QDBusMessage::createMethodCall(UD2_DBUS_SERVICE, m_udi,
-                                                    DBUS_INTERFACE_INTROSPECT, "Introspect");
+    QDBusMessage call = QDBusMessage::createMethodCall(UD2_DBUS_SERVICE, m_udi, DBUS_INTERFACE_INTROSPECT, "Introspect");
     QDBusPendingReply<QString> reply = QDBusConnection::systemBus().call(call);
 
     if (reply.isValid())
