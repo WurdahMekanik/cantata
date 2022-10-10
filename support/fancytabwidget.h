@@ -77,8 +77,8 @@ public:
     bool underMouse;
 
 protected:
-    void enterEvent(QEvent *) override;
-    void leaveEvent(QEvent *) override;
+    void enterEvent(QEvent *);
+    void leaveEvent(QEvent *);
 
 private:
     FancyTabBar *tabbar;

@@ -52,8 +52,8 @@ Q_SIGNALS:
     void hoverFinished();
 
 protected:
-    void enterEvent(QEvent *) override { emit hoverStarted(); }
-    void leaveEvent(QEvent *) override { emit hoverFinished(); }
+    void enterEvent(QEvent *) { emit hoverStarted(); }
+    void leaveEvent(QEvent *) { emit hoverFinished(); }
 };
 
 class AutohidingSplitter : public QSplitter
