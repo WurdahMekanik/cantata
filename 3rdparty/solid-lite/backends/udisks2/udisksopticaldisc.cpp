@@ -26,6 +26,7 @@
 
 #include <QFile>
 #include <QMap>
+#include <QMutex>
 #include <QMutexLocker>
 #include <QDBusConnection>
 
@@ -34,11 +35,10 @@
 #include "udisks2.h"
 #include "udisksdevice.h"
 #include "udisksopticaldisc.h"
-#include "soliddefs_p.h"
 
 typedef QMap<QByteArray, Solid::OpticalDisc::ContentTypes> ContentTypesCache;
-SOLID_GLOBAL_STATIC(ContentTypesCache, cache)
-SOLID_GLOBAL_STATIC(QMutex, cacheLock)
+Q_GLOBAL_STATIC(ContentTypesCache, cache)
+Q_GLOBAL_STATIC(QMutex, cacheLock)
 
 // inspired by http://cgit.freedesktop.org/hal/tree/hald/linux/probing/probe-volume.c
 static Solid::OpticalDisc::ContentType advancedDiscDetect(const QByteArray & device_file)
@@ -252,7 +252,9 @@ Solid::OpticalDisc::ContentTypes OpticalDisc::availableContent() const
     }
 
     if (m_needsReprobe) {
-        QMutexLocker lock(cacheLock);
+        // $$$ TODO: figure out why this stupid hack works, and fix it
+        QMutex *theLock = cacheLock;
+        QMutexLocker lock(theLock);
 
         const QByteArray deviceFile = m_device->prop("Device").toByteArray();
 
@@ -285,7 +287,9 @@ void OpticalDisc::slotDrivePropertiesChanged(const QString &ifaceName, const QVa
     Q_UNUSED(ifaceName);
 
     if (changedProps.keys().contains("Media") || invalidatedProps.contains("Media")) {
-        QMutexLocker lock(cacheLock);
+        // $$$ TODO: figure out why this stupid hack works, and fix it
+        QMutex *theLock = cacheLock;
+        QMutexLocker lock(theLock);
         m_needsReprobe = true;
         m_cachedContent = Solid::OpticalDisc::NoContent;
         cache->remove(m_device->prop("Device").toByteArray());
