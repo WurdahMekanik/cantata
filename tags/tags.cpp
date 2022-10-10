@@ -35,12 +35,13 @@
 #include <QDir>
 #include <QFile>
 #include <QString>
+#include <QStringConverter>
 #include <QStringList>
-#include <QTextCodec>
 #include <QDebug>
 #define TAGLIB_VERSION CANTATA_MAKE_VERSION(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION)
 
 #include <taglib/taglib.h>
+#include <taglib/tstringlist.h>
 #if TAGLIB_VERSION >= CANTATA_MAKE_VERSION(1,8,0)
 #include <taglib/tpropertymap.h>
 #endif
@@ -98,18 +99,6 @@ void enableDebug()
     debugEnabled=true;
 }
 
-static QString tString2QString(const TagLib::String &str)
-{
-    static QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    return codec->toUnicode(str.toCString(true)).trimmed();
-}
-
-TagLib::String qString2TString(const QString &str)
-{
-    QString val = str.trimmed();
-    return TagLib::String(val.toUtf8().data(), TagLib::String::UTF8);
-}
-
 static inline int convertToCantataRating(double r)
 {
     return qRound(r*10.0);
@@ -130,7 +119,7 @@ static double parseDoubleString(const TagLib::String &str)
         return 0.0;
     }
 
-    QString s=tString2QString(str);
+    QString s=TStringToQString(str);
     bool ok=false;
     double v=s.toDouble(&ok);
 
@@ -143,7 +132,7 @@ static int parseIntString(const TagLib::String &str)
         return 0;
     }
 
-    QString s=tString2QString(str);
+    QString s=TStringToQString(str);
     bool ok=false;
     int v=s.toInt(&ok);
 
@@ -156,7 +145,7 @@ static double parseRgString(const TagLib::String &str)
         return 0.0;
     }
 
-    QString s=tString2QString(str);
+    QString s=TStringToQString(str);
     s.remove(QLatin1String(" dB"), Qt::CaseInsensitive);
 
     if (str.isEmpty()) {
@@ -285,9 +274,8 @@ static void setRva2Tag(TagLib::ID3v2::Tag *tag, const std::string &tagName, doub
 {
     TagLib::ID3v2::RelativeVolumeFrame *frame = nullptr;
     TagLib::ID3v2::FrameList frameList = tag->frameList("RVA2");
-    TagLib::ID3v2::FrameList::ConstIterator it = frameList.begin();
-    for (; it != frameList.end(); ++it) {
-        TagLib::ID3v2::RelativeVolumeFrame *fr=dynamic_cast<TagLib::ID3v2::RelativeVolumeFrame*>(*it);
+    for (auto frame : frameList) {
+        TagLib::ID3v2::RelativeVolumeFrame *fr=dynamic_cast<TagLib::ID3v2::RelativeVolumeFrame*>(frame);
         if (fr && fr->identification() == tagName) {
             frame = fr;
             break;
@@ -317,44 +305,39 @@ static void readID3v2Tags(TagLib::ID3v2::Tag *tag, Song *song, ReplayGain *rg, Q
         const TagLib::ID3v2::FrameList &albumArtist = tag->frameListMap()["TPE2"];
 
         if (!albumArtist.isEmpty()) {
-            song->albumartist=tString2QString(albumArtist.front()->toString());
+            song->albumartist=TStringToQString(albumArtist.front()->toString());
         }
 
         const TagLib::ID3v2::FrameList &composer = tag->frameListMap()["TCOM"];
 
         if (!composer.isEmpty()) {
-            song->setComposer(tString2QString(composer.front()->toString()));
+            song->setComposer(TStringToQString(composer.front()->toString()));
         }
 
         const TagLib::ID3v2::FrameList &disc = tag->frameListMap()["TPOS"];
 
         if (!disc.isEmpty()) {
-            song->disc=splitDiscNumber(tString2QString(disc.front()->toString())).first;
+            song->disc=splitDiscNumber(TStringToQString(disc.front()->toString())).first;
         }
 
         const TagLib::ID3v2::FrameList &tcon = tag->frameListMap()["TCON"];
         if (!tcon.isEmpty()) {
-            TagLib::ID3v2::FrameList::ConstIterator it = tcon.begin();
-            TagLib::ID3v2::FrameList::ConstIterator end = tcon.end();
+            for (auto frame : tcon) {
+                TagLib::ID3v2::TextIdentificationFrame *textIDFrame = static_cast<TagLib::ID3v2::TextIdentificationFrame *>(frame);
+                TagLib::StringList fields = textIDFrame->fieldList();
 
-            for (; it!=end; ++it) {
-                TagLib::ID3v2::TextIdentificationFrame *f = static_cast<TagLib::ID3v2::TextIdentificationFrame *>(*it);
-                TagLib::StringList fields = f->fieldList();
-                TagLib::StringList::ConstIterator fIt = fields.begin();
-                TagLib::StringList::ConstIterator fEnd = fields.end();
-
-                for (; fIt!=fEnd; ++fIt) {
-                    if ((*fIt).isEmpty()) {
+                for (TagLib::String field : fields) {
+                    if (field.isEmpty()) {
                         continue;
                     }
 
                     bool ok;
-                    int number = (*fIt).toInt(&ok);
+                    int number = field.toInt(&ok);
                     QString genre;
                     if (ok && number >= 0 && number <= 255) {
-                        genre = tString2QString(TagLib::ID3v1::genre(number));
+                        genre = TStringToQString(TagLib::ID3v1::genre(number));
                     } else {
-                        genre = tString2QString(*fIt);
+                        genre = TStringToQString(field);
                     }
                     song->addGenre(genre);
                 }
@@ -426,7 +409,7 @@ static void readID3v2Tags(TagLib::ID3v2::Tag *tag, Song *song, ReplayGain *rg, Q
             for (; it != end && !found; ++it) {
                 TagLib::ID3v2::UnsynchronizedLyricsFrame *l=dynamic_cast<TagLib::ID3v2::UnsynchronizedLyricsFrame*>(*it);
                 if (l /*&& !l->language().isEmpty() && 0==strcmp(l->language().data(), lyricsLang)*/) {
-                    *lyrics=tString2QString(l->toString());
+                    *lyrics=TStringToQString(l->toString());
                     found=true;
                 }
             }
@@ -482,7 +465,7 @@ static bool updateID3v2Tag(TagLib::ID3v2::Tag *tag, const char *tagName, const Q
             frame = new TagLib::ID3v2::TextIdentificationFrame(tagName);
             tag->addFrame(frame);
         }
-        frame->setText(qString2TString(value));
+        frame->setText(QStringToTString(value));
         return true;
     }
     return false;
@@ -513,7 +496,7 @@ static bool writeID3v2Tags(TagLib::ID3v2::Tag *tag, const Song &from, const Song
             tag->removeFrames("TCON");
             if (to.genres[1].isEmpty()) {
                 DBUG << "set genre" << (to.firstGenre().trimmed());
-                tag->setGenre(qString2TString(to.firstGenre().trimmed()));
+                tag->setGenre(QStringToTString(to.firstGenre().trimmed()));
             } else {
                 for(int i=0; i<Song::constNumGenres; ++i) {
                     QString genre = to.genres[i].trimmed();
@@ -521,7 +504,7 @@ static bool writeID3v2Tags(TagLib::ID3v2::Tag *tag, const Song &from, const Song
                         TagLib::ID3v2::TextIdentificationFrame *frame = new TagLib::ID3v2::TextIdentificationFrame("TCON");
                         tag->addFrame(frame);
                         DBUG << "add genre" << genre;
-                        frame->setText(qString2TString(genre));
+                        frame->setText(QStringToTString(genre));
                     }
                 }
             }
@@ -582,20 +565,18 @@ static void readAPETags(TagLib::APE::Tag *tag, Song *song, ReplayGain *rg, QImag
 
     if (song) {
         if (map.contains("Album Artist")) {
-            song->albumartist=tString2QString(map["Album Artist"].toString());
+            song->albumartist=TStringToQString(map["Album Artist"].toString());
         }
         if (map.contains("Composer")) {
-            song->setComposer(tString2QString(map["Composer"].toString()));
+            song->setComposer(TStringToQString(map["Composer"].toString()));
         }
         if (map.contains("Disc")) {
-            song->disc=splitDiscNumber(tString2QString(map["Disc"].toString())).first;
+            song->disc=splitDiscNumber(TStringToQString(map["Disc"].toString())).first;
         }
         if (map.contains("GENRE")) {
             TagLib::StringList genres=map["GENRE"].values();
-            TagLib::StringList::ConstIterator it=genres.begin();
-            TagLib::StringList::ConstIterator end=genres.end();
-            for (; it!=end; ++it) {
-                song->addGenre(tString2QString(*it));
+            for (auto genre : genres) {
+                song->addGenre(TStringToQString(genre));
             }
         }
     }
@@ -646,7 +627,7 @@ static bool updateAPETag(TagLib::APE::Tag *tag, const char *tagName, const QStri
             return true;
         }
     } else {
-        tag->addValue(tagName, qString2TString(value), true);
+        tag->addValue(tagName, QStringToTString(value), true);
         return true;
     }
     return false;
@@ -670,12 +651,12 @@ static bool writeAPETags(TagLib::APE::Tag *tag, const Song &from, const Song &to
         if (0!=from.compareGenres(to)) {
             tag->removeItem("GENRE");
             if (to.genres[1].isEmpty()) {
-                tag->setGenre(qString2TString(to.firstGenre().trimmed()));
+                tag->setGenre(QStringToTString(to.firstGenre().trimmed()));
             } else {
                 for(int i=0; i<Song::constNumGenres; ++i) {
                     QString genre = to.genres[i].trimmed();
                     if (!genre.isEmpty()) {
-                        tag->addValue("GENRE", qString2TString(genre), false);
+                        tag->addValue("GENRE", QStringToTString(genre), false);
                     }
                 }
             }
@@ -766,23 +747,21 @@ static void readVorbisCommentTags(TagLib::Ogg::XiphComment *tag, Song *song, Rep
     if (song) {
         TagLib::String str=readVorbisTag(tag, "ALBUMARTIST");
         if (str.isEmpty()) {
-            song->albumartist=tString2QString(str);
+            song->albumartist=TStringToQString(str);
         }
         str=readVorbisTag(tag, "COMPOSER");
         if (str.isEmpty()) {
-            song->setComposer(tString2QString(str));
+            song->setComposer(TStringToQString(str));
         }
         str=readVorbisTag(tag, "DISCNUMBER");
         if (str.isEmpty()) {
-            song->disc=splitDiscNumber(tString2QString(str)).first;
+            song->disc=splitDiscNumber(TStringToQString(str)).first;
         }
         if (tag->contains("GENRE")) {
             const TagLib::StringList &genres = tag->fieldListMap()["GENRE"];
             if (!genres.isEmpty()) {
-                TagLib::StringList::ConstIterator it=genres.begin();
-                TagLib::StringList::ConstIterator end=genres.end();
-                for (; it!=end; ++it) {
-                    song->addGenre(tString2QString(*it));
+                for (auto genre : genres) {
+                    song->addGenre(TStringToQString(genre));
                 }
             }
         }
@@ -861,7 +840,7 @@ static void readVorbisCommentTags(TagLib::Ogg::XiphComment *tag, Song *song, Rep
     if (lyrics) {
         TagLib::String str=readVorbisTag(tag, "LYRICS");
         if (!str.isEmpty()) {
-            *lyrics=tString2QString(str);
+            *lyrics=TStringToQString(str);
         }
     }
 
@@ -879,7 +858,7 @@ static bool updateVorbisCommentTag(TagLib::Ogg::XiphComment *tag, const char *ta
             return true;
         }
     } else {
-        tag->addField(tagName, qString2TString(value), true);
+        tag->addField(tagName, QStringToTString(value), true);
         return true;
     }
     return false;
@@ -907,12 +886,12 @@ static bool writeVorbisCommentTags(TagLib::Ogg::XiphComment *tag, const Song &fr
         if (0!=from.compareGenres(to)) {
             tag->removeFields("GENRE");
             if (to.genres[1].isEmpty()) {
-                tag->setGenre(qString2TString(to.firstGenre().trimmed()));
+                tag->setGenre(QStringToTString(to.firstGenre().trimmed()));
             } else {
                 for(int i=0; i<Song::constNumGenres; ++i) {
                     QString  genre = to.genres[i].trimmed();
                     if (!genre.isEmpty()) {
-                        tag->addField("GENRE", qString2TString(genre), false);
+                        tag->addField("GENRE", QStringToTString(genre), false);
                     }
                 }
             }
@@ -976,7 +955,7 @@ static bool writeVorbisCommentTags(TagLib::Ogg::XiphComment *tag, const Song &fr
     }
 
     if (!img.isEmpty()) {
-        tag->addField("COVERART", qString2TString(QString::fromLatin1(img.toBase64())));
+        tag->addField("COVERART", QStringToTString(QString::fromLatin1(img.toBase64())));
         changed=true;
     }
 
@@ -999,10 +978,10 @@ static void readMP4Tags(TagLib::MP4::Tag *tag, Song *song, ReplayGain *rg, QImag
 
     if (song) {
         if (tag->contains("aART") && !tag->item("aART").toStringList().isEmpty()) {
-            song->albumartist=tString2QString(tag->item("aART").toStringList().front());
+            song->albumartist=TStringToQString(tag->item("aART").toStringList().front());
         }
         if (tag->contains("\xA9wrt") && !tag->item("\xA9wrt").toStringList().isEmpty()) {
-            song->setComposer(tString2QString(tag->item("\xA9wrt").toStringList().front()));
+            song->setComposer(TStringToQString(tag->item("\xA9wrt").toStringList().front()));
         }
         if (tag->contains("disk")) {
             song->disc=tag->item("disk").toIntPair().first;
@@ -1011,8 +990,8 @@ static void readMP4Tags(TagLib::MP4::Tag *tag, Song *song, ReplayGain *rg, QImag
             TagLib::StringList genres=tag->item("\251gen").toStringList();
             TagLib::StringList::ConstIterator it=genres.begin();
             TagLib::StringList::ConstIterator end=genres.end();
-            for (; it!=end; ++it) {
-                song->addGenre(tString2QString(*it));
+            for (auto genre : genres) {
+                song->addGenre(TStringToQString(genre));
             }
         }
     }
@@ -1043,7 +1022,7 @@ static void readMP4Tags(TagLib::MP4::Tag *tag, Song *song, ReplayGain *rg, QImag
     }
     if (lyrics) {
         if (tag->contains("\251lyr") && !tag->item("\251lyr").toStringList().isEmpty()) {
-            *lyrics=tString2QString(tag->item("\251lyr").toStringList().front());
+            *lyrics=TStringToQString(tag->item("\251lyr").toStringList().front());
         }
     }
     if (rating) {
@@ -1061,7 +1040,7 @@ static bool updateMP4Tag(TagLib::MP4::Tag *tag, const char *tagName, const QStri
             return true;
         }
     } else {
-        tag->setItem(tagName, TagLib::StringList(qString2TString(value)));
+        tag->setItem(tagName, TagLib::StringList(QStringToTString(value)));
         return true;
     }
     return false;
@@ -1084,13 +1063,13 @@ static bool writeMP4Tags(TagLib::MP4::Tag *tag, const Song &from, const Song &to
         }
         if (0!=from.compareGenres(to)) {
             if (to.genres[1].isEmpty()) {
-                tag->setGenre(qString2TString(to.firstGenre().trimmed()));
+                tag->setGenre(QStringToTString(to.firstGenre().trimmed()));
             } else {
                 TagLib::StringList tagGenres;
                 for(int i=0; i<Song::constNumGenres; ++i) {
                     QString genre = to.genres[i].trimmed();
                     if (!genre.isEmpty()) {
-                        tagGenres.append(qString2TString(genre));
+                        tagGenres.append(QStringToTString(genre));
                     }
                 }
                 tag->setItem("\251gen",tagGenres);
@@ -1143,20 +1122,18 @@ static void readASFTags(TagLib::ASF::Tag *tag, Song *song, int *rating)
         const TagLib::ASF::AttributeListMap &map = tag->attributeListMap();
 
         if (map.contains("WM/AlbumTitle") && !map["WM/AlbumTitle"].isEmpty()) {
-            song->albumartist=tString2QString(map["WM/AlbumTitle"].front().toString());
+            song->albumartist=TStringToQString(map["WM/AlbumTitle"].front().toString());
         }
         if (map.contains("WM/Composer") && !map["WM/Composer"].isEmpty()) {
-            song->setComposer(tString2QString(map["WM/Composer"].front().toString()));
+            song->setComposer(TStringToQString(map["WM/Composer"].front().toString()));
         }
         if (map.contains("WM/PartOfSet") && !map["WM/PartOfSet"].isEmpty()) {
-            song->albumartist=map["WM/PartOfSet"].front().toUInt();
+            song->albumartist=QChar(map["WM/PartOfSet"].front().toUInt());
         }
         if (map.contains("WM/Genre") && !map["WM/Genre"].isEmpty()) {
             const TagLib::ASF::AttributeList &genres=map["WM/Genre"];
-            TagLib::ASF::AttributeList::ConstIterator it=genres.begin();
-            TagLib::ASF::AttributeList::ConstIterator end=genres.end();
-            for (; it!=end; ++it) {
-                song->addGenre(tString2QString((*it).toString()));
+            for (auto genre : genres) {
+                song->addGenre(TStringToQString(genre.toString()));
             }
         }
     }
@@ -1179,7 +1156,7 @@ static bool updateASFTag(TagLib::ASF::Tag *tag, const char *tagName, const QStri
             return true;
         }
     } else {
-        tag->setAttribute(tagName, qString2TString(value));
+        tag->setAttribute(tagName, QStringToTString(value));
         return true;
     }
     return false;
@@ -1204,12 +1181,12 @@ static bool writeASFTags(TagLib::ASF::Tag *tag, const Song &from, const Song &to
         if (0!=from.compareGenres(to)) {
             tag->removeItem("WM/Genre");
             if (to.genres[1].isEmpty()) {
-                tag->setGenre(qString2TString(to.firstGenre().trimmed()));
+                tag->setGenre(QStringToTString(to.firstGenre().trimmed()));
             } else {
                 for(int i=0; i<Song::constNumGenres; ++i) {
                     QString genre = to.genres[i].trimmed();
                     if (!genre.isEmpty()) {
-                        tag->addAttribute("WM/Genre", qString2TString(genre));
+                        tag->addAttribute("WM/Genre", QStringToTString(genre));
                     }
                 }
             }
@@ -1235,10 +1212,10 @@ static void readTags(const TagLib::FileRef fileref, Song *song, ReplayGain *rg, 
     DBUG << (char *)(song ? "songs" : "") << (char *)(rg ? "rg" : "") << (char *)(img ? "img" : "") << (char *)(lyrics ? "lyrics" : "") << (char *)(rating ? "rating" : "");
     TagLib::Tag *tag=fileref.tag();
     if (song) {
-        song->title=tString2QString(tag->title());
-        song->artist=tString2QString(tag->artist());
-        song->album=tString2QString(tag->album());
-//        song->genre=tString2QString(tag->genre());
+        song->title=TStringToQString(tag->title());
+        song->artist=TStringToQString(tag->artist());
+        song->album=TStringToQString(tag->album());
+//        song->genre=TStringToQString(tag->genre());
         song->track=tag->track();
         song->year=tag->year();
     }
@@ -1324,7 +1301,7 @@ static void readTags(const TagLib::FileRef fileref, Song *song, ReplayGain *rg, 
         }
     }
     if (song && song->genres[0].isEmpty()) {
-        song->addGenre(tString2QString(tag->genre()));
+        song->addGenre(TStringToQString(tag->genre()));
     }
 }
 
@@ -1334,19 +1311,19 @@ static bool writeTags(const TagLib::FileRef fileref, const Song &from, const Son
     TagLib::Tag *tag=fileref.tag();
     if (/*!from.isEmpty() &&*/ !to.isEmpty()) {
         if (from.title!=to.title) {
-            tag->setTitle(qString2TString(to.title));
+            tag->setTitle(QStringToTString(to.title));
             changed=true;
         }
         if (from.artist!=to.artist) {
-            tag->setArtist(qString2TString(to.artist));
+            tag->setArtist(QStringToTString(to.artist));
             changed=true;
         }
         if (from.album!=to.album) {
-            tag->setAlbum(qString2TString(to.album));
+            tag->setAlbum(QStringToTString(to.album));
             changed=true;
         }
 //        if (from.genre!=to.genre) {
-//            tag->setGenre(qString2TString(to.genre));
+//            tag->setGenre(QStringToTString(to.genre));
 //            changed=true;
 //        }
         if (from.track!=to.track) {
@@ -1358,7 +1335,7 @@ static bool writeTags(const TagLib::FileRef fileref, const Song &from, const Son
             changed=true;
         }
         if (saveComment && from.comment()!=to.comment()) {
-            tag->setComment(qString2TString(to.comment()));
+            tag->setComment(QStringToTString(to.comment()));
             changed=true;
         }
     }
@@ -1486,7 +1463,7 @@ QString readLyrics(const QString &fileName)
 QString readComment(const QString &fileName)
 {
     TagLib::FileRef fileref = getFileRef(fileName);
-    return fileref.isNull() ? QString() : tString2QString(fileref.tag()->comment());
+    return fileref.isNull() ? QString() : TStringToQString(fileref.tag()->comment());
 }
 
 static Update update(const TagLib::FileRef fileref, const Song &from, const Song &to, const RgTags &rg, const QByteArray &img, int id3Ver=-1, bool saveComment=false, int rating=-1)
@@ -1531,8 +1508,8 @@ Update updateArtistAndTitle(const QString &fileName, const Song &song)
 
     TagLib::MPEG::File *mpeg=dynamic_cast<TagLib::MPEG::File *>(fileref.file());
     TagLib::Tag *tag=fileref.tag();
-    tag->setTitle(qString2TString(song.title));
-    tag->setArtist(qString2TString(song.artist));
+    tag->setTitle(QStringToTString(song.title));
+    tag->setArtist(QStringToTString(song.artist));
 
     if (mpeg) {
         #ifdef TAGLIB_CAN_SAVE_ID3VER
@@ -1647,10 +1624,8 @@ QMap<QString, QString> readAll(const QString &fileName)
 
     #if TAGLIB_VERSION >= CANTATA_MAKE_VERSION(1,8,0)
     TagLib::PropertyMap properties=fileref.file()->properties();
-    TagLib::PropertyMap::ConstIterator it = properties.begin();
-    TagLib::PropertyMap::ConstIterator end = properties.end();
-    for (; it!=end; ++it) {
-        allTags.insert(tString2QString(it->first.upper()), tString2QString(it->second.toString(", ")));
+    for (auto property : properties) {
+        allTags.insert(TStringToQString(property.first.upper()), TStringToQString(property.second.toString(", ")));
     }
 
     if (fileref.audioProperties()) {
@@ -1666,7 +1641,7 @@ QMap<QString, QString> readAll(const QString &fileName)
 QString id3Genre(int id)
 {
     // Clementine: In theory, genre 0 is "blues"; in practice it's invalid.
-    return 0==id ? QString() : tString2QString(TagLib::ID3v1::genre(id));
+    return 0==id ? QString() : TStringToQString(TagLib::ID3v1::genre(id));
 }
 
 }
