@@ -63,7 +63,7 @@ private Q_SLOTS:
     void streamUrl(const QString &url);
     void checkPlayer();
 #ifndef LIBVLC_FOUND
-    void bufferingProgress(int progress);
+    void bufferingProgress(float progress);
 #endif
 
 private:
@@ -85,6 +85,7 @@ private:
     libvlc_media_t *media;
     #else
     QMediaPlayer *player;
+    QAudioOutput *audioOutput;
     #endif
 };
 
