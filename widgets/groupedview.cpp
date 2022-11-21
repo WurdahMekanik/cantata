@@ -26,7 +26,6 @@
 #include "mpd-interface/mpdstatus.h"
 #include "mpd-interface/song.h"
 #include "basicitemdelegate.h"
-#include "itemview.h"
 #include "config.h"
 #include "widgets/icons.h"
 #include "widgets/ratingwidget.h"
@@ -52,7 +51,7 @@ static double sizeAdjust=1.25;
 
 void GroupedView::setup()
 {
-    int height=QApplication::fontMetrics().height();
+    int height=QFontMetricsF(QApplication::font()).height();
     sizeAdjust=1.25;
 
     if (height>17) {
@@ -199,7 +198,7 @@ GroupedViewDelegate::~GroupedViewDelegate()
 
 QSize GroupedViewDelegate::sizeHint(int type, bool isCollection) const
 {
-    int textHeight = QApplication::fontMetrics().height()*sizeAdjust;
+    int textHeight = QFontMetricsF(QApplication::font()).height()*sizeAdjust;
 
     if (isCollection || AlbumHeader==type) {
         return QSize(64, qMax(constCoverSize, (qMax(constIconSize, textHeight)*2)+constBorder)+(2*constBorder));
