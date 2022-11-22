@@ -41,13 +41,7 @@
 #include <QTextDocument>
 #include "pathrequester.h"
 
-//#include <kstandardaction.h>
-//#include <kdebug.h>
-//#include <kdeversion.h>
-//#include <kglobal.h>
-
 #include "acceleratormanager_private.h"
-//#include <kstandardaction_p.h>
 
 
 /*********************************************************************
@@ -129,10 +123,10 @@ private:
 
     void addChild(Item *item);
 
-    QWidget       *m_widget;
-    AccelString  m_content;
-    ItemList      *m_children;
-    int           m_index;
+    QWidget *m_widget;
+    AccelString m_content;
+    ItemList *m_children;
+    int m_index;
 
   };
 };
@@ -273,7 +267,7 @@ void AcceleratorManagerPrivate::traverseChildren(QWidget *widget, Item *item)
     // Ignore unless we have the direct parent
     if(qobject_cast<QWidget *>(w->parent()) != widget) continue;
 
-    if ( !w->isVisibleTo( widget ) || (w->isTopLevel() && qobject_cast<QMenu*>(w) == nullptr) )
+    if ( !w->isVisibleTo( widget ) || (w->isWindow() && qobject_cast<QMenu*>(w) == nullptr) )
         continue;
 
     if ( AcceleratorManagerPrivate::ignored_widgets.contains( w ) )
