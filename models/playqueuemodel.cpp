@@ -26,22 +26,18 @@
 
 #include "playqueuemodel.h"
 #include "mpd-interface/mpdparseutils.h"
-#include "mpd-interface/mpdstats.h"
 #include "mpd-interface/cuefile.h"
 #include "streams/streamfetcher.h"
 #include "streamsmodel.h"
 #include "http/httpserver.h"
 #include "gui/settings.h"
-#include "support/icon.h"
 #include "support/monoicon.h"
 #include "support/utils.h"
 #include "config.h"
 #include "support/action.h"
 #include "support/actioncollection.h"
 #include "support/globalstatic.h"
-#include "gui/covers.h"
 #include "widgets/groupedview.h"
-#include "widgets/icons.h"
 #include "roles.h"
 #ifdef ENABLE_DEVICES_SUPPORT
 #include "devicesmodel.h"
@@ -441,9 +437,9 @@ PlayQueueModel::PlayQueueModel(QObject *parent)
     removeDuplicatesAction->setEnabled(false);
     QColor col=Utils::monoIconColor();
     undoAction=ActionCollection::get()->createAction("playqueue-undo", tr("Undo"), MonoIcon::icon(FontAwesome::undo, col));
-    undoAction->setShortcut(Qt::ControlModifier+Qt::Key_Z);
+    undoAction->setShortcut(Qt::ControlModifier | Qt::Key_Z);
     redoAction=ActionCollection::get()->createAction("playqueue-redo", tr("Redo"), MonoIcon::icon(FontAwesome::repeat, col));
-    redoAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+Qt::Key_Z);
+    redoAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Z);
     connect(undoAction, SIGNAL(triggered()), this, SLOT(undo()));
     connect(redoAction, SIGNAL(triggered()), this, SLOT(redo()));
     connect(removeDuplicatesAction, SIGNAL(triggered()), this, SLOT(removeDuplicates()));

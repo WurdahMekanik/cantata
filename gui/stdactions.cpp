@@ -30,7 +30,6 @@
 #ifdef ENABLE_DEVICES_SUPPORT
 #include "models/devicesmodel.h"
 #endif
-#include "support/icon.h"
 #include "widgets/icons.h"
 #include "support/utils.h"
 #include "widgets/mirrormenu.h"
@@ -99,9 +98,9 @@ StdActions::StdActions()
     insertAfterCurrentAction = ActionCollection::get()->createAction("insertintoplayqueue", QObject::tr("Insert After Current"));
     addRandomAlbumToPlayQueueAction = ActionCollection::get()->createAction("addrandomalbumtoplayqueue", QObject::tr("Append Random Album"));
     replacePlayQueueAction = ActionCollection::get()->createAction("replaceplayqueue", QObject::tr("Play Now (And Replace Play Queue)"), Icons::self()->replacePlayQueueIcon);
-    savePlayQueueAction->setShortcut(Qt::ControlModifier+Qt::Key_S);
-    appendToPlayQueueAction->setShortcut(Qt::ControlModifier+Qt::Key_P);
-    replacePlayQueueAction->setShortcut(Qt::ControlModifier+Qt::Key_R);
+    savePlayQueueAction->setShortcut(Qt::ControlModifier | Qt::Key_S);
+    appendToPlayQueueAction->setShortcut(Qt::ControlModifier | Qt::Key_P);
+    replacePlayQueueAction->setShortcut(Qt::ControlModifier | Qt::Key_R);
 
     addWithPriorityAction = new Action(QObject::tr("Add With Priority"), nullptr);
     setPriorityAction = new Action(QObject::tr("Set Priority"), nullptr);
@@ -124,7 +123,7 @@ StdActions::StdActions()
     setCoverAction = ActionCollection::get()->createAction("setimage", QObject::tr("Set Image"));
     removeAction = ActionCollection::get()->createAction("remove", QObject::tr("Remove"), Icons::self()->removeIcon);
     searchAction = ActionCollection::get()->createAction("search", QObject::tr("Find"), Icons::self()->searchIcon);
-    searchAction->setShortcut(Qt::ControlModifier+Qt::Key_F);
+    searchAction->setShortcut(Qt::ControlModifier | Qt::Key_F);
 
     addToStoredPlaylistAction->setMenu(PlaylistsModel::self()->menu());
 
@@ -140,9 +139,9 @@ StdActions::StdActions()
     addRandomAlbumToPlayQueueAction->setVisible(false);
 
     zoomInAction = ActionCollection::get()->createAction("zoomIn", QObject::tr("Zoom In"));
-    zoomInAction->setShortcut(Qt::ControlModifier+Qt::Key_Plus);
+    zoomInAction->setShortcut(Qt::ControlModifier | Qt::Key_Plus);
     zoomOutAction = ActionCollection::get()->createAction("zoomOut", QObject::tr("Zoom Out"));
-    zoomOutAction->setShortcut(Qt::ControlModifier+Qt::Key_Minus);
+    zoomOutAction->setShortcut(Qt::ControlModifier | Qt::Key_Minus);
 }
 
 void StdActions::enableAddToPlayQueue(bool en)

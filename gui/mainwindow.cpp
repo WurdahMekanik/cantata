@@ -26,6 +26,7 @@
 
 #include "mainwindow.h"
 #include "application.h"
+#include "qactiongroup.h"
 #include "support/thread.h"
 #include "trayitem.h"
 #include "support/messagebox.h"
@@ -42,8 +43,6 @@
 #endif
 #include "settings.h"
 #include "support/utils.h"
-#include "models/musiclibraryitemartist.h"
-#include "models/musiclibraryitemalbum.h"
 #include "models/mpdlibrarymodel.h"
 #include "librarypage.h"
 #include "folderpage.h"
@@ -51,17 +50,12 @@
 #include "searchpage.h"
 #include "customactions.h"
 #include "apikeys.h"
-#include "support/gtkstyle.h"
 #include "widgets/mirrormenu.h"
 #ifdef ENABLE_DEVICES_SUPPORT
-#include "devices/filejob.h"
 #include "devices/devicespage.h"
 #include "models/devicesmodel.h"
 #include "devices/actiondialog.h"
 #include "devices/syncdialog.h"
-#if defined CDDB_FOUND || defined MUSICBRAINZ5_FOUND
-#include "devices/audiocddevice.h"
-#endif
 #endif
 #include "online/onlineservicespage.h"
 #include "http/httpserver.h"
@@ -101,7 +95,6 @@
 #include "playlists/dynamicplaylists.h"
 #include "support/messagewidget.h"
 #include "widgets/groupedview.h"
-#include "widgets/actionitemdelegate.h"
 #include "widgets/icons.h"
 #include "widgets/volumecontrol.h"
 #include "support/action.h"
@@ -128,15 +121,14 @@
 #include <cstdlib>
 #include <algorithm>
 
-static int nextKey(int &key)
+static Qt::Key nextKey(int &key)
 {
-    int k=key;
     if (Qt::Key_0==key) {
         key=Qt::Key_A;
     } else if (Qt::Key_Colon==++key) {
         key=Qt::Key_0;
     }
-    return k;
+    return Qt::Key(key);
 }
 
 static const char * constRatingKey="rating";
@@ -314,7 +306,7 @@ MainWindow::MainWindow(QWidget *parent)
     addLocalFilesToPlayQueueAction = ActionCollection::get()->createAction("addlocalfiles", tr("Add Local Files"));
     QIcon clearIcon = MonoIcon::icon(FontAwesome::times, MonoIcon::constRed, MonoIcon::constRed);
     clearPlayQueueAction = ActionCollection::get()->createAction("clearplaylist", tr("Clear"), clearIcon);
-    clearPlayQueueAction->setShortcut(Qt::ControlModifier+Qt::Key_K);
+    clearPlayQueueAction->setShortcut(Qt::ControlModifier | Qt::Key_K);
     centerPlayQueueAction = ActionCollection::get()->createAction("centerplaylist", tr("Center On Current Track"), Icons::self()->centrePlayQueueOnTrackIcon);
     expandInterfaceAction = ActionCollection::get()->createAction("expandinterface", tr("Expanded Interface"), MonoIcon::icon(FontAwesome::expand, iconCol));
     expandInterfaceAction->setCheckable(true);
@@ -331,7 +323,7 @@ MainWindow::MainWindow(QWidget *parent)
     consumePlayQueueAction = ActionCollection::get()->createAction("consumeplaylist", tr("Consume"), Icons::self()->consumeIcon, tr("When consume is activated, a song is removed from the play queue after it has been played."));
     searchPlayQueueAction = ActionCollection::get()->createAction("searchplaylist", tr("Find in Play Queue"), Icons::self()->searchIcon);
     addAction(searchPlayQueueAction);
-    searchPlayQueueAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+Qt::Key_F);
+    searchPlayQueueAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_F);
     #ifdef ENABLE_HTTP_STREAM_PLAYBACK
     streamPlayAction = ActionCollection::get()->createAction("streamplay", tr("Play HTTP Output Stream"), Icons::self()->httpStreamIcon);
     streamPlayAction->setCheckable(true);
@@ -360,11 +352,11 @@ MainWindow::MainWindow(QWidget *parent)
     editPlayQueueTagsAction->setSettingsText(tr("Edit Track Information (Play Queue)"));
     #endif
     addAction(expandAllAction = ActionCollection::get()->createAction("expandall", tr("Expand All")));
-    expandAllAction->setShortcut(Qt::ControlModifier+Qt::Key_Down);
+    expandAllAction->setShortcut(Qt::ControlModifier | Qt::Key_Down);
     addAction(collapseAllAction = ActionCollection::get()->createAction("collapseall", tr("Collapse All")));
-    collapseAllAction->setShortcut(Qt::ControlModifier+Qt::Key_Up);
+    collapseAllAction->setShortcut(Qt::ControlModifier | Qt::Key_Up);
     cancelAction = ActionCollection::get()->createAction("cancel", tr("Cancel"), Icons::self()->cancelIcon);
-    cancelAction->setShortcut(Qt::AltModifier+Qt::Key_Escape);
+    cancelAction->setShortcut(Qt::AltModifier | Qt::Key_Escape);
     connect(cancelAction, SIGNAL(triggered()), messageWidget, SLOT(animatedHide()));
 
     StdActions::self()->playPauseTrackAction->setEnabled(false);
@@ -420,23 +412,23 @@ MainWindow::MainWindow(QWidget *parent)
     #define TAB_ACTION(A) A->icon(), A->text(), A->text()
     int sidebarPageShortcutKey=Qt::Key_1;
     addAction(showPlayQueueAction = ActionCollection::get()->createAction("showplayqueue", tr("Play Queue"), Icons::self()->playqueueIcon));
-    showPlayQueueAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+Qt::Key_Q);
+    showPlayQueueAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | Qt::Key_Q);
     tabWidget->addTab(playQueuePage, TAB_ACTION(showPlayQueueAction), playQueueInSidebar);
     connect(showPlayQueueAction, SIGNAL(triggered()), this, SLOT(showPlayQueue()));
     libraryPage = new LibraryPage(this);
     addAction(libraryTabAction = ActionCollection::get()->createAction("showlibrarytab", tr("Library"), Icons::self()->libraryIcon));
-    libraryTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    libraryTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     tabWidget->addTab(libraryPage, TAB_ACTION(libraryTabAction), !hiddenPages.contains(libraryPage->metaObject()->className()));
     connect(libraryTabAction, SIGNAL(triggered()), this, SLOT(showLibraryTab()));
     folderPage = new FolderPage(this);
     addAction(foldersTabAction = ActionCollection::get()->createAction("showfolderstab", tr("Folders"), Icons::self()->foldersIcon));
-    foldersTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    foldersTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     tabWidget->addTab(folderPage, TAB_ACTION(foldersTabAction), !hiddenPages.contains(folderPage->metaObject()->className()));
     connect(foldersTabAction, SIGNAL(triggered()), this, SLOT(showFoldersTab()));
     folderPage->setEnabled(!hiddenPages.contains(folderPage->metaObject()->className()));
     playlistsPage = new PlaylistsPage(this);
     addAction(playlistsTabAction = ActionCollection::get()->createAction("showplayliststab", tr("Playlists"), Icons::self()->playlistsIcon));
-    playlistsTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    playlistsTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     tabWidget->addTab(playlistsPage, TAB_ACTION(playlistsTabAction), !hiddenPages.contains(playlistsPage->metaObject()->className()));
     connect(playlistsTabAction, SIGNAL(triggered()), this, SLOT(showPlaylistsTab()));
     connect(playlistsPage, SIGNAL(error(const QString &)), SLOT(showError(const QString &)));
@@ -446,7 +438,7 @@ MainWindow::MainWindow(QWidget *parent)
     stopDynamicButton->setDefaultAction(DynamicPlaylists::self()->stopAct());
     onlinePage = new OnlineServicesPage(this);
     addAction(onlineTabAction = ActionCollection::get()->createAction("showonlinetab", tr("Internet"), Icons::self()->onlineIcon));
-    onlineTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    onlineTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     tabWidget->addTab(onlinePage, TAB_ACTION(onlineTabAction), !hiddenPages.contains(onlinePage->metaObject()->className()));
     onlinePage->setEnabled(!hiddenPages.contains(onlinePage->metaObject()->className()));
     connect(onlineTabAction, SIGNAL(triggered()), this, SLOT(showOnlineTab()));
@@ -455,14 +447,14 @@ MainWindow::MainWindow(QWidget *parent)
     #ifdef ENABLE_DEVICES_SUPPORT
     devicesPage = new DevicesPage(this);
     addAction(devicesTabAction = ActionCollection::get()->createAction("showdevicestab", tr("Devices"), Icons::self()->devicesIcon));
-    devicesTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    devicesTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     tabWidget->addTab(devicesPage, TAB_ACTION(devicesTabAction), !hiddenPages.contains(devicesPage->metaObject()->className()));
     DevicesModel::self()->setEnabled(!hiddenPages.contains(devicesPage->metaObject()->className()));
     connect(devicesTabAction, SIGNAL(triggered()), this, SLOT(showDevicesTab()));
     #endif
     searchPage = new SearchPage(this);
     addAction(searchTabAction = ActionCollection::get()->createAction("showsearchtab", tr("Search"), Icons::self()->searchTabIcon));
-    searchTabAction->setShortcut(Qt::ControlModifier+Qt::ShiftModifier+nextKey(sidebarPageShortcutKey));
+    searchTabAction->setShortcut(Qt::ControlModifier | Qt::ShiftModifier | nextKey(sidebarPageShortcutKey));
     connect(searchTabAction, SIGNAL(triggered()), this, SLOT(showSearchTab()));
     connect(searchPage, SIGNAL(locate(QList<Song>)), this, SLOT(locateTracks(QList<Song>)));
     tabWidget->addTab(searchPage, TAB_ACTION(searchTabAction), !hiddenPages.contains(searchPage->metaObject()->className()));
@@ -609,7 +601,7 @@ MainWindow::MainWindow(QWidget *parent)
         menuButton->setVisible(false);
         #else
         showMenubarAction = ActionCollection::get()->createAction("showmenubar", tr("Show Menubar"));
-        showMenubarAction->setShortcut(Qt::ControlModifier+Qt::Key_M);
+        showMenubarAction->setShortcut(Qt::ControlModifier | Qt::Key_M);
         showMenubarAction->setCheckable(true);
         connect(showMenubarAction, SIGNAL(toggled(bool)), this, SLOT(toggleMenubar()));
         #endif
@@ -735,7 +727,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
         Action *action=ActionCollection::get()->createAction(QLatin1String("rating")+QString::number(i), text);
         action->setProperty(constRatingKey, i*Song::Rating_Step);
-        action->setShortcut(Qt::AltModifier+Qt::Key_0+i);
+        action->setShortcut(QKeyCombination(Qt::AltModifier, Qt::Key_0).toCombined() | Qt::Key(i));
         action->setSettingsText(ratingAction);
         ratingAction->menu()->addAction(action);
         connect(action, SIGNAL(triggered()), SLOT(setRating()));
@@ -1450,7 +1442,7 @@ void MainWindow::outputsUpdated(const QList<Output> &outputs)
             act->setData(o.id);
             act->setCheckable(true);
             act->setChecked(o.enabled);
-            act->setShortcut(Qt::ControlModifier+Qt::AltModifier+nextKey(i));
+            act->setShortcut(Qt::ControlModifier | Qt::AltModifier | nextKey(i));
         }
         menu->addSeparator();
         QMenu* moveMenu = menu->addMenu(tr("Move output to this partition"));
@@ -1534,7 +1526,7 @@ void MainWindow::updateConnectionsMenu()
                 act->setCheckable(true);
                 act->setChecked(d.name==currentConn);
                 act->setActionGroup(connectionsGroup);
-                act->setShortcut(Qt::ControlModifier+nextKey(i));
+                act->setShortcut(Qt::ControlModifier | nextKey(i));
             }
         }
     }
