@@ -23,6 +23,7 @@
 
 #include "actionitemdelegate.h"
 #include "models/roles.h"
+#include "support/action.h"
 #include "support/icon.h"
 #include "support/utils.h"
 #include "config.h"

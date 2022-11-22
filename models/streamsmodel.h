@@ -30,8 +30,6 @@
 #include "gui/apikeys.h"
 #include "actionmodel.h"
 #include "mpd-interface/stream.h"
-#include "mpd-interface/playlist.h"
-#include "support/icon.h"
 #include <QList>
 #include <QMap>
 #include <QSet>

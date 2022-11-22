@@ -32,7 +32,7 @@
 #include <QStringBuilder>
 #include <QRegularExpression>
 #include <QRegularExpression>
-#include <QTextCodec>
+#include <QStringConverter>
 #include <QTextStream>
 #include <QStringList>
 #include <QUrl>

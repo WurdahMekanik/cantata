@@ -21,8 +21,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <QListView>
 #include "application.h"
+#include <QListView>
 #include "settings.h"
 #include "support/proxystyle.h"
 #include "models/mpdlibrarymodel.h"
@@ -32,7 +32,9 @@
 #include "mpd-interface/mpdstats.h"
 #include "mpd-interface/mpdstatus.h"
 #include "support/thread.h"
+#ifdef ENABLE_TAGLIB
 #include "tags/taghelperiface.h"
+#endif
 #ifdef ENABLE_SCROBBLING
 #include "scrobbling/scrobbler.h"
 #endif

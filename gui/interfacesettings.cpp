@@ -23,14 +23,11 @@
 
 #include "interfacesettings.h"
 #include "settings.h"
-#include "models/sqllibrarymodel.h"
 #include "support/utils.h"
 #include "support/fancytabwidget.h"
-#include "support/pathrequester.h"
 #include "widgets/basicitemdelegate.h"
 #include "widgets/playqueueview.h"
 #include "widgets/itemview.h"
-#include "db/librarydb.h"
 #include <QComboBox>
 #include <QDir>
 #include <QMap>
@@ -103,8 +100,9 @@ static const char * constSep=",";
 
 class CoverNameValidator : public QValidator
 {
-    public:
+    Q_OBJECT
 
+public:
     CoverNameValidator(QObject *parent) : QValidator(parent) { }
 
     State validate(QString &input, int &) const override
@@ -599,3 +597,4 @@ void InterfaceSettings::storeCoversInMpdDirToggled()
 }
 
 #include "moc_interfacesettings.cpp"
+#include "interfacesettings.moc"

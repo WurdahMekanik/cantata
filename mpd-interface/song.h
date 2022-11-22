@@ -304,7 +304,7 @@ Q_DECLARE_METATYPE(Song)
 QDataStream & operator<<(QDataStream &stream, const Song &song);
 QDataStream & operator>>(QDataStream &stream, Song &song);
 
-inline uint qHash(const Song &key)
+inline size_t qHash(const Song &key)
 {
     return qHash(key.albumArtist()+key.album+key.title+key.file);
 }

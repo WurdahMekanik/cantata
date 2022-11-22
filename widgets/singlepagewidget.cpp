@@ -28,6 +28,7 @@
 #include "gui/stdactions.h"
 #include "gui/application.h"
 #include "mpd-interface/mpdconnection.h"
+#include <QActionGroup>
 #include <QGridLayout>
 #include <QHBoxLayout>
 
