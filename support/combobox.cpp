@@ -25,8 +25,8 @@
 #include "lineedit.h"
 #include "utils.h"
 #include <QAbstractItemView>
-#include <QDesktopWidget>
-#include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QStyleOptionComboBox>
 
 // Max number of items before we try to force a scrollbar in popup menu...
@@ -38,8 +38,9 @@ ComboBox::ComboBox(QWidget *p)
 {
     #if !defined Q_OS_WIN && !defined Q_OS_MAC
     if (-1==maxPopupItemCount) {
-        if (QApplication::desktop()) {
-            maxPopupItemCount=((QApplication::desktop()->height()/(QApplication::fontMetrics().height()*1.5))*0.75)+0.5;
+        QScreen *qs = QGuiApplication::primaryScreen();
+        if (qs) {
+            maxPopupItemCount=((qs->availableGeometry().height()/(QWidget::fontMetrics().height()*1.5))*0.75)+0.5;
         } else {
             maxPopupItemCount=32;
         }

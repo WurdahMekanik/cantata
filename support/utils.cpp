@@ -32,7 +32,7 @@
 #include <QTime>
 #include <QWidget>
 #include <QStyle>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QEventLoop>
 #include <QStandardPaths>
 #include <QSystemTrayIcon>
@@ -749,7 +749,7 @@ QString Utils::dataDir(const QString &sub, bool create)
 
     static QString location;
     if (location.isEmpty()) {
-        location=QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+        location=QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
         if (QCoreApplication::organizationName()==QCoreApplication::applicationName()) {
             location=location.replace(QCoreApplication::organizationName()+Utils::constDirSep+QCoreApplication::applicationName(),
                                       QCoreApplication::applicationName());
@@ -905,13 +905,10 @@ int Utils::layoutSpacing(QWidget *w)
 
 double Utils::screenDpiScale()
 {
-    static double scaleFactor=-1.0;
-    if (scaleFactor<0) {
-        QWidget *dw=QApplication::desktop();
-        if (!dw) {
-            return 1.0;
-        }
-        scaleFactor=dw->logicalDpiX()>120 ? qMin(qMax(dw->logicalDpiX()/96.0, 1.0), 4.0) : 1.0;
+    static double scaleFactor=1.0;
+    QScreen *qs = QGuiApplication::primaryScreen();
+    if (qs) {
+        scaleFactor = qs->devicePixelRatio();
     }
     return scaleFactor;
 }
@@ -923,9 +920,9 @@ bool Utils::limitedHeight(QWidget *w)
     if (!init) {
         limited=!qgetenv("CANTATA_NETBOOK").isEmpty();
         if (!limited) {
-            QDesktopWidget *dw=QApplication::desktop();
-            if (dw) {
-                limited=dw->availableGeometry(w).size().height()<=800;
+            QScreen *qs=w->screen();
+            if (qs) {
+                limited=qs->availableGeometry().height()<=800;
             }
         }
     }
