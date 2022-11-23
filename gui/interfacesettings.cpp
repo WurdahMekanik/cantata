@@ -34,7 +34,7 @@
 #include <QComboBox>
 #include <QDir>
 #include <QMap>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSet>
 #ifdef QT_QTDBUS_FOUND
 #include <QDBusConnection>
@@ -395,13 +395,14 @@ static bool localeAwareCompare(const QString &a, const QString &b)
 
 static QSet<QString> translationCodes(const QString &dir)
 {
+    static QRegularExpression langRegExp(QRegularExpression(QRegularExpression::anchoredPattern("^cantata_(.*).qm$")));
     QSet<QString> codes;
     QDir d(dir);
     QStringList installed(d.entryList(QStringList() << "*.qm"));
-    QRegExp langRegExp("^cantata_(.*).qm$");
     for (const QString &filename: installed) {
-        if (langRegExp.exactMatch(filename)) {
-            codes.insert(langRegExp.cap(1));
+        QRegularExpressionMatch filenameMatch = langRegExp.match(filename);
+        if (filenameMatch.hasMatch()) {
+            codes.insert(filenameMatch.captured(1));
         }
     }
     return codes;

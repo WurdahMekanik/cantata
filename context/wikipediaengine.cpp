@@ -28,7 +28,7 @@
 #include "config.h"
 #include <QUrlQuery>
 #include <QXmlStreamReader>
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <QDebug>
 static bool debugEnabled=false;
@@ -182,29 +182,36 @@ static QString stripLastEmptySection(QString answer)
 
 static QString wikiToHtml(QString answer, bool introOnly, const QUrl &url)
 {
+    static QRegularExpression reflistRegexp("\\n[^\\n]*\\n\\{\\{reflist", QRegularExpression::CaseInsensitiveOption);
+    static QRegularExpression referencesRegexp("\\n[^\\n]*\\n&lt;references", QRegularExpression::CaseInsensitiveOption);
+    static QRegularExpression sourcesSectionRegexp("\n==\\s*Sources\\s*==");
+    static QRegularExpression notesSectionsRegexp("\n==\\s*Notes\\s*==");
+    static QRegularExpression refsSectionRegexp("\n==\\s*References\\s*==");
+    static QRegularExpression extLinksSectionRegexp("\n==\\s*External links\\s*==");
+
     QString u=fixWikiLink(url);
     int start = answer.indexOf('>', answer.indexOf("<text"))+1;
-    int end = answer.lastIndexOf(QRegExp("\\n[^\\n]*\\n\\{\\{reflist", Qt::CaseInsensitive));
+    int end = answer.lastIndexOf(reflistRegexp);
     if (end < start) {
         end = INT_MAX;
     }
-    int e = answer.lastIndexOf(QRegExp("\\n[^\\n]*\\n&lt;references", Qt::CaseInsensitive));
+    int e = answer.lastIndexOf(referencesRegexp);
     if (e > start && e < end) {
         end = e;
     }
-    e = answer.lastIndexOf(QRegExp("\n==\\s*Sources\\s*=="));
+    e = answer.lastIndexOf(sourcesSectionRegexp);
     if (e > start && e < end) {
         end = e;
     }
-    e = answer.lastIndexOf(QRegExp("\n==\\s*Notes\\s*=="));
+    e = answer.lastIndexOf(notesSectionsRegexp);
     if (e > start && e < end) {
         end = e;
     }
-    e = answer.lastIndexOf(QRegExp("\n==\\s*References\\s*=="));
+    e = answer.lastIndexOf(refsSectionRegexp);
     if (e > start && e < end) {
         end = e;
     }
-    e = answer.lastIndexOf(QRegExp("\n==\\s*External links\\s*=="));
+    e = answer.lastIndexOf(extLinksSectionRegexp);
     if (e > start && e < end) {
         end = e;
     }
@@ -217,35 +224,40 @@ static QString wikiToHtml(QString answer, bool introOnly, const QUrl &url)
     answer = strip(answer, "{{", "}}"); // strip wiki internal stuff
     answer.replace("&lt;", "<").replace("&gt;", ">");
     answer = strip(answer, "<!--", "-->"); // strip comments
-    answer.remove(QRegExp("<ref[^>]*/>")); // strip inline refereces
+    static QRegularExpression inlineRefsRegexp("<ref[^>]*/>");
+    answer.remove(inlineRefsRegexp); // strip inline refereces
     answer = strip(answer, "<ref", "</ref>", "<ref"); // strip refereces
 //     answer = strip(answer, "<ref ", "</ref>", "<ref"); // strip argumented refereces
     answer = strip(answer, "[[File:", "]]", "[["); // strip images etc
     answer = strip(answer, "[[Image:", "]]", "[["); // strip images etc
-
-    answer.replace(QRegExp("\\[\\[[^\\[\\]]*\\|([^\\[\\]\\|]*)\\]\\]"), "\\1"); // collapse commented links
+    static QRegularExpression commentedLinksRegexp("\\[\\[[^\\[\\]]*\\|([^\\[\\]\\|]*)\\]\\]");
+    answer.replace(commentedLinksRegexp, "\\1"); // collapse commented links
     answer.replace("[['", "[["); // Fixes '74 (e.g. 1974) causing errors!
     answer.remove("[[").remove("]]"); // remove wiki link "tags"
     answer = strip(answer, "{| class=&quot;wikitable&quot;", "|}");
 
     answer = answer.trimmed();
 
-//     answer.replace(QRegExp("\\n\\{\\|[^\\n]*wikitable[^\\n]*\\n!"), "\n<table><th>");
+//     answer.replace(QRegularExpression("\\n\\{\\|[^\\n]*wikitable[^\\n]*\\n!"), "\n<table><th>");
 
     answer.replace("\n\n", "<br>");
     answer.replace("(  ; ", "(");
 //     answer.replace("\n\n", "</p><p align=\"justify\">");
-    answer.replace(QRegExp("\\n'''([^\\n]*)'''\\n"), "<hr><b>\\1</b>\n");
-    answer.replace(QRegExp("\\n\\{\\|[^\\n]*\\n"), "\n");
-    answer.replace(QRegExp("\\n\\|[^\\n]*\\n"), "\n");
+    static QRegularExpression boldRegexp("\\n'''([^\\n]*)'''\\n");
+    answer.replace(boldRegexp, "<hr><b>\\1</b>\n");
+    static QRegularExpression newlineRegexp1("\\n\\{\\|[^\\n]*\\n");
+    answer.replace(newlineRegexp1, "\n");
+    static QRegularExpression newlineRegexp2("\\n\\|[^\\n]*\\n");
+    answer.replace(newlineRegexp2, "\n");
     answer.replace("\n*", "<br>");
     answer.replace("\n", "");
     answer.replace("'''s ", "'s");
-    answer.replace("'''", "¬").replace(QRegExp("¬([^¬]*)¬"), "<b>\\1</b>");
-    answer.replace("''", "¬").replace(QRegExp("¬([^¬]*)¬"), "<i>\\1</i>");
+    static QRegularExpression otherRegexp("¬([^¬]*)¬");
+    answer.replace("'''", "¬").replace(otherRegexp, "<b>\\1</b>");
+    answer.replace("''", "¬").replace(otherRegexp, "<i>\\1</i>");
     if (!introOnly) {
-        answer.replace("===", "¬").replace(QRegExp("¬([^¬]*)¬"), "<h3>\\1</h3>");
-        answer.replace("==", "¬").replace(QRegExp("¬([^¬]*)¬"), "<h2>\\1</h2>");
+        answer.replace("===", "¬").replace(otherRegexp, "<h3>\\1</h3>");
+        answer.replace("==", "¬").replace(otherRegexp, "<h2>\\1</h2>");
     }
     answer.replace("&amp;nbsp;", " ");
     answer.replace("&ndash;", "-");
@@ -404,7 +416,7 @@ void WikipediaEngine::parseTitles()
 
     if (titles.isEmpty()) {
         DBUG <<  "No titles";
-        QRegExp regex(QLatin1Char('^') + hostLang + QLatin1String(".*$"));
+        QRegularExpression regex(QLatin1Char('^') + hostLang + QLatin1String(".*$"));
         int index = preferredLangs.indexOf(regex);
         if (-1!=index && index < preferredLangs.count()-1) {
             // use next preferred language as base for fetching langlinks since
