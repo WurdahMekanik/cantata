@@ -35,7 +35,6 @@
 #include <QDir>
 #include <QFile>
 #include <QString>
-#include <QStringConverter>
 #include <QStringList>
 #include <QDebug>
 #define TAGLIB_VERSION CANTATA_MAKE_VERSION(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION)

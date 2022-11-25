@@ -31,8 +31,6 @@
 #include <QFileInfo>
 #include <QStringBuilder>
 #include <QRegularExpression>
-#include <QRegularExpression>
-#include <QStringConverter>
 #include <QTextStream>
 #include <QStringList>
 #include <QUrl>
@@ -84,23 +82,6 @@ QByteArray CueFile::getLoadLine(const QString &str)
     }
 
     return MPDConnection::encodeName(str);
-}
-
-static const QList<QTextCodec *> & codecList()
-{
-    static QList<QTextCodec *> codecs;
-    if (codecs.isEmpty()) {
-        codecs.append(QTextCodec::codecForName("UTF-8"));
-        QTextCodec *codec=QTextCodec::codecForLocale();
-        if (codec && !codecs.contains(codec)) {
-            codecs.append(codec);
-        }
-        codec=QTextCodec::codecForName("System");
-        if (codec && !codecs.contains(codec)) {
-            codecs.append(codec);
-        }
-    }
-    return codecs;
 }
 
 // Split a raw .cue line into logical parts, returning a list where:
@@ -249,34 +230,14 @@ bool CueFile::parse(const QString &fileName, const QString &dir, QList<Song> &so
     DBUG << fileName;
 
     // CUE file stream
-    QScopedPointer<QTextStream> textStream;
-    QString decoded;
     QFile f(dir+fileName);
-    if (f.open(QIODevice::ReadOnly)) {
-        // First attempt to use QTextDecoder to decode cue file contents into a QString
-        QByteArray contents=f.readAll();
-        for (QTextCodec *codec: codecList()) {
-            QTextDecoder decoder(codec);
-            decoded=decoder.toUnicode(contents);
-            if (!decoder.hasFailure()) {
-                textStream.reset(new QTextStream(&decoded, QIODevice::ReadOnly));
-                break;
-            }
-        }
-        f.close();
-
-        if (!textStream) {
-            decoded.clear();
-            // Failed to use text decoders, fall back to old method...
-            f.open(QIODevice::ReadOnly|QIODevice::Text);
-            textStream.reset(new QTextStream(&f));
-            textStream->setCodec(QTextCodec::codecForUtfText(f.peek(1024), QTextCodec::codecForName("UTF-8")));
-        }
-    }
-
+    f.open(QIODevice::ReadOnly|QIODevice::Text);
+    // NOTE: QTextStream defaults to using QStringConverter::Utf8 encoding, but will try to auto-detect encoding via BOM
+    QScopedPointer<QTextStream> textStream(new QTextStream(&f));
     if (!textStream) {
         return false;
     }
+    DBUG << "textStream encoding:" << textStream->encoding();
 
     // file dir
     QString fileDir=fileName.contains("/") ? Utils::getDir(fileName) : QString();
