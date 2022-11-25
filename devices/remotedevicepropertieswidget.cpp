@@ -22,13 +22,10 @@
  */
 
 #include "remotedevicepropertieswidget.h"
-#include "filenameschemedialog.h"
-#include "gui/covers.h"
 #include <QTabWidget>
 #include <QIcon>
 #include <QUrlQuery>
 #include "support/lineedit.h"
-#include "config.h"
 
 enum Type {
     Type_SshFs,
@@ -42,7 +39,7 @@ RemoteDevicePropertiesWidget::RemoteDevicePropertiesWidget(QWidget *parent)
 {
     setupUi(this);
     if (qobject_cast<QTabWidget *>(parent)) {
-        verticalLayout->setMargin(4);
+        verticalLayout->setContentsMargins(4,4,4,4);
     }
     type->addItem(tr("Secure Shell (sshfs)"), (int)Type_SshFs);
     type->addItem(tr("Locally Mounted Folder"), (int)Type_File);

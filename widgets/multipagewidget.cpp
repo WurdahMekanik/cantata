@@ -79,8 +79,9 @@ public:
         setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
         mainText->setText(t);
         subText->setText(s);
-        layout->setMargin(qMin(layout->margin(), 8));
-        setMinimumHeight(qMax(textSize, size)+(layout->margin()*2));
+        int m = qMin(layout->contentsMargins().top(), 8);
+        layout->setContentsMargins(m,m,m,m);
+        setMinimumHeight(qMax(textSize, size)+(layout->contentsMargins().top()*2));
         updateToolTip();
         setFocusPolicy(Qt::TabFocus);
     }
@@ -142,14 +143,15 @@ MultiPageWidget::MultiPageWidget(QWidget *p)
     scroll->setProperty(ProxyStyle::constModifyFrameProp, ProxyStyle::VF_Side|ProxyStyle::VF_Top);
     mainPage->setLayout(mainLayout);
     mainLayout->addWidget(scroll);
-    mainLayout->setMargin(0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
     mainLayout->addWidget(infoLabel);
     infoLabel->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mainLayout->addWidget(sizer);
     layout->setSpacing(0);
     layout->setSizeConstraint(QLayout::SetMinimumSize);
-    layout->setMargin(qMin(layout->margin(), 4));
+    int m = qMin(layout->contentsMargins().top(), 4);
+    layout->setContentsMargins(m,m,m,m);
     #ifdef Q_OS_MAC
     // TODO: This feels a bt of a hack...
     mainPage->setContentsMargins(-3, 0, -3, 0);
