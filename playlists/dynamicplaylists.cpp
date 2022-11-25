@@ -27,7 +27,6 @@
 #include "mpd-interface/mpdconnection.h"
 #include "widgets/icons.h"
 #include "models/roles.h"
-#include "network/networkaccessmanager.h"
 #include "gui/settings.h"
 #include "support/actioncollection.h"
 #include "support/globalstatic.h"
@@ -175,7 +174,7 @@ QVariant DynamicPlaylists::data(const QModelIndex &index, int role) const
         return IS_ACTIVE(entryList.at(index.row()).name) ? Icons::self()->replacePlayQueueIcon : icn;
     case Cantata::Role_Actions: {
         QVariant v;
-        v.setValue<QList<Action *> >(QList<Action *>() << (IS_ACTIVE(entryList.at(index.row()).name) ? stopAction : startAction));
+        v.setValue<QList<Action *> &>(QList<Action *>() << (IS_ACTIVE(entryList.at(index.row()).name) ? stopAction : startAction));
         return v;
     }
     default:

@@ -26,7 +26,6 @@
 
 #include "device.h"
 #include "mpd-interface/song.h"
-#include "support/utils.h"
 #include "freespaceinfo.h"
 #include "models/musiclibraryitemroot.h"
 #include "http/httpserver.h"
@@ -37,6 +36,7 @@ class Thread;
 
 struct FileOnlySong : public Song
 {
+    FileOnlySong() : Song() { }
     FileOnlySong(const Song &o) : Song(o) { }
     bool operator==(const FileOnlySong &o) const { return file==o.file; }
     bool operator<(const FileOnlySong &o) const { return file.compare(o.file)<0; }
