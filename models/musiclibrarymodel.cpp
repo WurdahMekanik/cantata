@@ -35,7 +35,6 @@
 #include "gui/settings.h"
 #include <QFile>
 #include <QTimer>
-#include <QStringRef>
 #include <QDateTime>
 #include <QDir>
 #include <QMimeData>

@@ -219,7 +219,7 @@ void JamendoXmlParser::parseArtist(QList<Song> *songList, QXmlStreamReader &xml)
         xml.readNext();
 
         if (QXmlStreamReader::StartElement==xml.tokenType()) {
-            QStringRef name = xml.name();
+            QStringView name = xml.name();
 
             if (QLatin1String("name")==name) {
                 song.artist=xml.readElementText().trimmed();
@@ -245,7 +245,7 @@ void JamendoXmlParser::parseAlbum(Song &song, QList<Song> *songList, QXmlStreamR
         xml.readNext();
 
         if (QXmlStreamReader::StartElement==xml.tokenType()) {
-            QStringRef name = xml.name();
+            QStringView name = xml.name();
 
             if (QLatin1String("name")==name) {
                 song.album=xml.readElementText().trimmed();
@@ -281,7 +281,7 @@ void JamendoXmlParser::parseSong(Song &song, const QString &albumGenre, QXmlStre
         xml.readNext();
 
         if (QXmlStreamReader::StartElement==xml.tokenType()) {
-            QStringRef name = xml.name();
+            QStringView name = xml.name();
 
             if (QLatin1String("name")==name) {
                 song.title=xml.readElementText().trimmed();
