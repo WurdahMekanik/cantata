@@ -27,8 +27,11 @@
 #include <QSet>
 #include <QRegularExpression>
 
-static const char * constITunesNameSpace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
-static const char * constMediaNameSpace = "http://search.yahoo.com/mrss/";
+namespace RssParser
+{
+    static const QString constITunesNameSpace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+    static const QString constMediaNameSpace = "http://search.yahoo.com/mrss/";
+}
 
 using namespace RssParser;
 
