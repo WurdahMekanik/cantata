@@ -307,7 +307,7 @@ static QSet<QString> toSet(const QString &str)
 {
     QStringList parts=str.split(constSep, CANTATA_SKIP_EMPTY);
     QSet<QString> set;
-    for (QString s: parts) {
+    for (const QString &s: parts) {
         set.insert(s.trimmed());
     }
     return set;
@@ -420,7 +420,7 @@ void InterfaceSettings::showEvent(QShowEvent *e)
         transCodes+=translationCodes(CANTATA_SYS_TRANS_DIR);
         #endif
 
-        for (const QString &code: transCodes) {
+        for (const QString &code: qAsConst(transCodes)) {
             QString langName = QLocale::languageToString(QLocale(code).language());
             QString nativeName = QLocale(code).nativeLanguageName();
             if (!nativeName.isEmpty()) {

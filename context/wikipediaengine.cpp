@@ -450,7 +450,7 @@ void WikipediaEngine::getPage(const QStringList &query, Mode mode, const QString
     QStringList queryCopy(query);
     QStringList queries;
     QStringList simplifiedTitles;
-    for (QString t: titles) {
+    for (const QString &t: titles) {
         simplifiedTitles.append(t.simplified());
     }
 

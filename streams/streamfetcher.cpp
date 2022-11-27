@@ -98,7 +98,7 @@ static QString parseAsx(const QByteArray &data, const QSet<QString> &handlers)
 {
     QStringList lines=QString(data).split(endlinePlusRegexp, CANTATA_SKIP_EMPTY);
 
-    for (QString line: lines) {
+    for (QString &line: lines) {
         int ref=line.indexOf(QLatin1String("<ref href"), Qt::CaseInsensitive);
         if (-1!=ref) {
             for (const QString &handler: handlers) {
@@ -179,7 +179,7 @@ static QString parse(const QByteArray &data, const QString &host)
         DBUG << "ext3mu/2";
         return parseExt3Mu(data, handlers);
     } else {
-        for (const auto &h: handlers) {
+        for (const auto &h: qAsConst(handlers)) {
             DBUG << h;
             if (data.startsWith(h.toLatin1()+"://")) {
                 QStringList lines=QString(data).split(endlineRegexp, CANTATA_SKIP_EMPTY);
