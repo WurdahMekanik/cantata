@@ -89,7 +89,7 @@ void NetworkJob::connectJob()
 
     connect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
     connect(job, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
-    connect(job, SIGNAL(error(QNetworkReply::NetworkError)), this, SIGNAL(error(QNetworkReply::NetworkError)));
+    connect(job, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SIGNAL(errorOccurred(QNetworkReply::NetworkError)));
     connect(job, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(uploadProgress(qint64, qint64)));
     connect(job, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProg(qint64, qint64)));
     connect(job, SIGNAL(destroyed(QObject *)), this, SLOT(jobDestroyed(QObject *)));
@@ -101,7 +101,7 @@ void NetworkJob::cancelJob()
     if (job) {
         disconnect(job, SIGNAL(finished()), this, SLOT(jobFinished()));
         disconnect(job, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
-        disconnect(job, SIGNAL(error(QNetworkReply::NetworkError)), this, SIGNAL(error(QNetworkReply::NetworkError)));
+        disconnect(job, SIGNAL(errorOccurred(QNetworkReply::NetworkError)), this, SIGNAL(errorOccurred(QNetworkReply::NetworkError)));
         disconnect(job, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(uploadProgress(qint64, qint64)));
         disconnect(job, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProg(qint64, qint64)));
         disconnect(job, SIGNAL(destroyed(QObject *)), this, SLOT(jobDestroyed(QObject *)));
