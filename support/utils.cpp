@@ -905,10 +905,15 @@ int Utils::layoutSpacing(QWidget *w)
 
 double Utils::screenDpiScale()
 {
-    static double scaleFactor=1.0;
+    static double scaleFactor = -1.0;
+
     QScreen *qs = QGuiApplication::primaryScreen();
-    if (qs) {
-        scaleFactor = qs->devicePixelRatio();
+    if (scaleFactor<0 && qs) {
+//        double dpr = qs->devicePixelRatio();
+        double logicalDPI = qs->logicalDotsPerInch();
+        scaleFactor = logicalDPI > 120 ? qMin(qMax(logicalDPI/96.0, 1.0), 4.0) : 1.0;
+//        scaleFactor = dpr * logicalDPI / 96.0;
+//        std::cout << "Scale Factor: " << scaleFactor << std::endl;
     }
     return scaleFactor;
 }
