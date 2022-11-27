@@ -20,8 +20,6 @@ else ()
     set(ORGANIZATION_NAME ${CMAKE_PROJECT_NAME})
 endif ()
 
-
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(QT_MIN_VERSION 6.0)
 
@@ -85,7 +83,6 @@ endif()
 
 if (AVAHI_FOUND)
     set(CANTATA_SRCS ${CANTATA_SRCS} gui/findmpddialog.cpp gui/avahidiscovery.cpp gui/avahipoll.cpp)
-
     set(CANTATA_LIBS ${CANTATA_LIBS} ${AVAHI_LIBRARIES})
 endif()
 

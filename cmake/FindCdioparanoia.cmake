@@ -8,11 +8,11 @@
 cmake_policy(SET CMP0075 NEW)
 cmake_policy(SET CMP0011 NEW)
 
-include(FindPkgConfig)
+find_package(PkgConfig)
 include(CheckIncludeFiles)
 
 if(PKG_CONFIG_FOUND)
-  pkg_check_modules (CDIOPARANOIA libcdio_paranoia)
+  pkg_check_modules(CDIOPARANOIA libcdio_paranoia)
   list(APPEND CDIOPARANOIA_INCLUDE_DIRS ${CDIOPARANOIA_INCLUDEDIR})
 endif()
 
@@ -31,7 +31,8 @@ if (CDIOPARANOIA_FOUND)
         message("Failed to determine cdio/paranoia header file location")
     endif()
 endif()
+
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(CDIOPARANOIA DEFAULT_MSG CDIOPARANOIA_INCLUDE_DIRS CDIOPARANOIA_LIBRARIES)
+find_package_handle_standard_args(Cdioparanoia DEFAULT_MSG CDIOPARANOIA_INCLUDE_DIRS CDIOPARANOIA_LIBRARIES)
 
 mark_as_advanced(CDIOPARANOIA_INCLUDE_DIRS CDIOPARANOIA_LIBRARIES)

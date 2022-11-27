@@ -32,13 +32,13 @@ install(FILES ${QT_PLUGINS_DIR}/mediaservice/dsengine.dll ${QT_PLUGINS_DIR}/medi
 
 # Qt, taglib, and zlib libraries...
 set(EXTRA_WIN_LIBS ${EXTRA_WIN_LIBS}
-    ${QT_BINARY_DIR}/Qt5Core.dll ${QT_BINARY_DIR}/Qt5Gui.dll ${QT_BINARY_DIR}/Qt5Network.dll ${QT_BINARY_DIR}/Qt5Svg.dll ${QT_BINARY_DIR}/Qt5Xml.dll
-    ${QT_BINARY_DIR}/Qt5Widgets.dll ${QT_BINARY_DIR}/Qt5WinExtras.dll ${QT_BINARY_DIR}/Qt5Sql.dll
+    ${QT_BINARY_DIR}/Qt6Core.dll ${QT_BINARY_DIR}/Qt6Gui.dll ${QT_BINARY_DIR}/Qt6Network.dll ${QT_BINARY_DIR}/Qt6Svg.dll ${QT_BINARY_DIR}/Qt6Xml.dll
+    ${QT_BINARY_DIR}/Qt6Widgets.dll ${QT_BINARY_DIR}/Qt6WinExtras.dll ${QT_BINARY_DIR}/Qt6Sql.dll
     ${QT_BINARY_DIR}/libgcc_s_dw2-1.dll ${QT_BINARY_DIR}/libstdc++-6.dll ${QT_BINARY_DIR}/libwinpthread-1.dll
     ${ZLIB_INCLUDE_DIR}/../bin/libz-1.dll ${TAGLIB_INCLUDES}/../bin/libtag.dll)
 
 if (ENABLE_HTTP_STREAM_PLAYBACK)
-    set(EXTRA_WIN_LIBS ${EXTRA_WIN_LIBS} ${QT_BINARY_DIR}/Qt5Multimedia.dll)
+    set(EXTRA_WIN_LIBS ${EXTRA_WIN_LIBS} ${QT_BINARY_DIR}/Qt6Multimedia.dll)
 endif()
 
 # Qt translation files...
