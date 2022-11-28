@@ -68,8 +68,6 @@ static inline Qt::TextElideMode elideMode()
     return Qt::LeftToRight==QApplication::layoutDirection() ? Qt::ElideRight : Qt::ElideLeft;
 }
 
-static int largeIconSize=32;
-static int smallIconSize=16;
 void FancyTabWidget::setup()
 {
     largeIconSize=Icon::stdSize(Utils::scaleForDpi(32));

@@ -30,6 +30,7 @@
 #include <QStringList>
 #include <QHash>
 #include <QMap>
+#include <QRegularExpression>
 
 class NetworkJob;
 
@@ -37,7 +38,7 @@ class UltimateLyricsProvider : public QObject {
     Q_OBJECT
 
 public:
-    static void enableDebug();
+    static void enableDebug() { debugEnabled = true; }
 
     UltimateLyricsProvider();
     ~UltimateLyricsProvider() override;
@@ -71,10 +72,34 @@ private Q_SLOTS:
     void lyricsFetched();
 
 private:
-    QString doTagReplace(QString str, const Song &song, bool doAll=true);
+    static QString extract(const QString &source, const QString &begin, const QString &end, bool isTag=false);
+    static QString extractXmlTag(const QString &source, const QString &tag);
+    static QString exclude(const QString &source, const QString &begin, const QString &end);
+    static QString excludeXmlTag(const QString &source, const QString &tag);
+    static void applyExtractRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song);
+    static void applyExcludeRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song);
+    static bool tryWithoutThe(const Song &s);
+    static QString doTagReplace(QString str, const Song &song);
+
     void doUrlReplace(const QString &tag, const QString &value, QString &u) const;
 
-private:
+    inline static bool debugEnabled = false;
+    inline static const QString constArtistArg = u"{Artist}"_qs;
+    inline static const QString constArtistLowerArg = u"{artist}"_qs;
+    inline static const QString constArtistLowerNoSpaceArg = u"{artist2}"_qs;
+    inline static const QString constArtistFirstCharArg = u"{a}"_qs;
+    inline static const QString constAlbumArg = u"{Album}"_qs;
+    inline static const QString constAlbumLowerArg = u"{album}"_qs;
+    inline static const QString constAlbumLowerNoSpaceArg = u"{album2}"_qs;
+    inline static const QString constTitleLowerArg = u"{title}"_qs;
+    inline static const QString constTitleArg = u"{Title}"_qs;
+    inline static const QString constTitleCaseArg = u"{Title2}"_qs;
+    inline static const QString constYearArg = u"{year}"_qs;
+    inline static const QString constTrackNoArg = u"{track}"_qs;
+    inline static const QString constThe = u"The "_qs;
+        // ಠ_ಠ
+    inline static const QRegularExpression tag_regexp = QRegularExpression("<(\\w+).*>");
+
     bool enabled;
     QHash<NetworkJob *, int> requests;
     QMap<int, Song> songs;

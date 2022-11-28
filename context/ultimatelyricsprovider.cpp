@@ -24,34 +24,12 @@
 #include "ultimatelyricsprovider.h"
 #include "network/networkaccessmanager.h"
 #include <QStringConverter>
-#include <QRegularExpression>
 #include <QXmlStreamReader>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QDebug>
-static bool debugEnabled=false;
+
 #define DBUG if (debugEnabled) qWarning() << "Lyrics" << __FUNCTION__
-void UltimateLyricsProvider::enableDebug()
-{
-    debugEnabled=true;
-}
-
-static const QString constArtistArg=QLatin1String("{Artist}");
-static const QString constArtistLowerArg=QLatin1String("{artist}");
-static const QString constArtistLowerNoSpaceArg=QLatin1String("{artist2}");
-static const QString constArtistFirstCharArg=QLatin1String("{a}");
-static const QString constAlbumArg=QLatin1String("{Album}");
-static const QString constAlbumLowerArg=QLatin1String("{album}");
-static const QString constAlbumLowerNoSpaceArg=QLatin1String("{album2}");
-static const QString constTitleLowerArg=QLatin1String("{title}");
-static const QString constTitleArg=QLatin1String("{Title}");
-static const QString constTitleCaseArg=QLatin1String("{Title2}");
-static const QString constYearArg=QLatin1String("{year}");
-static const QString constTrackNoArg=QLatin1String("{track}");
-static const QString constThe=QLatin1String("The ");
-
-// ಠ_ಠ
-static const QRegularExpression tag_regexp("<(\\w+).*>");
 
 static QString noSpace(const QString &text)
 {
@@ -76,125 +54,12 @@ static QString titleCase(const QString &text)
     return text[0].toUpper() + text.right(text.length() - 1).toLower();
 }
 
-static QString doTagReplace(QString str, const Song &song)
-{
-    if (str.contains(QLatin1Char('{'))) {
-        QString artistFixed=song.basicArtist();
-        str.replace(constArtistArg, artistFixed);
-        str.replace(constArtistFirstCharArg, firstChar(artistFixed));
-        str.replace(constAlbumArg, song.album);
-        str.replace(constTitleArg, song.basicTitle());
-        str.replace(constYearArg, QString::number(song.year));
-        str.replace(constTrackNoArg, QString::number(song.track));
-    }
-    return str;
-}
-
-static QString extract(const QString &source, const QString &begin, const QString &end, bool isTag=false)
-{
-    DBUG << "Looking for" << begin << end;
-    int beginIdx = source.indexOf(begin, 0, Qt::CaseInsensitive);
-    bool skipTagClose=false;
-
-    if (-1==beginIdx && isTag) {
-        beginIdx = source.indexOf(QString(begin).remove(">"), 0, Qt::CaseInsensitive);
-        skipTagClose=true;
-    }
-    if (-1==beginIdx) {
-        DBUG << "Failed to find begin";
-        return QString();
-    }
-    if (skipTagClose) {
-        int closeIdx=source.indexOf(">", beginIdx);
-        if (-1!=closeIdx) {
-            beginIdx=closeIdx+1;
-        } else {
-            beginIdx += begin.length();
-        }
-    } else {
-        beginIdx += begin.length();
-    }
-
-    int endIdx = source.indexOf(end, beginIdx, Qt::CaseInsensitive);
-    if (-1==endIdx && QLatin1String("null")!=end) {
-        DBUG << "Failed to find end";
-        return QString();
-    }
-
-    DBUG << "Found match";
-    return source.mid(beginIdx, endIdx - beginIdx - 1);
-}
-
-static QString extractXmlTag(const QString &source, const QString &tag)
-{
-    DBUG << "Looking for" << tag;
-    QRegularExpressionMatch tag_match = tag_regexp.match(tag);
-    if (!tag_match.hasMatch()) {
-        DBUG << "Failed to find tag";
-        return QString();
-    }
-
-    DBUG << "Found match";
-    return extract(source, tag, "</" + tag_match.captured(1) + ">", true);
-}
-
-static QString exclude(const QString &source, const QString &begin, const QString &end)
-{
-    int beginIdx = source.indexOf(begin, 0, Qt::CaseInsensitive);
-    if (-1==beginIdx) {
-        return source;
-    }
-
-    int endIdx = source.indexOf(end, beginIdx + begin.length(), Qt::CaseInsensitive);
-    if (-1==endIdx) {
-        return source;
-    }
-
-    return source.left(beginIdx) + source.right(source.length() - endIdx - end.length());
-}
-
-static QString excludeXmlTag(const QString &source, const QString &tag)
-{
-    QRegularExpressionMatch tag_match = tag_regexp.match(tag);
-    if (!tag_match.hasMatch()) {
-        return source;
-    }
-
-    return exclude(source, tag, "</" + tag_match.captured(1) + ">");
-}
-
-static void applyExtractRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song)
-{
-    for (const UltimateLyricsProvider::RuleItem &item: rule) {
-        if (item.second.isNull()) {
-            content = extractXmlTag(content, doTagReplace(item.first, song));
-        } else {
-            content = extract(content, doTagReplace(item.first, song), doTagReplace(item.second, song));
-        }
-    }
-}
-
-static void applyExcludeRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song)
-{
-    for (const UltimateLyricsProvider::RuleItem &item: rule) {
-        if (item.second.isNull()) {
-            content = excludeXmlTag(content, doTagReplace(item.first, song));
-        } else {
-            content = exclude(content, doTagReplace(item.first, song), doTagReplace(item.second, song));
-        }
-    }
-}
-
 static QString urlEncode(QString str)
 {
     str.replace(QLatin1Char('&'), QLatin1String("%26"));
     str.replace(QLatin1Char('?'), QLatin1String("%3f"));
     str.replace(QLatin1Char('+'), QLatin1String("%2b"));
     return str;
-}
-
-static bool tryWithoutThe(const Song &s) {
-    return 0==s.priority && s.basicArtist().startsWith(constThe);
 }
 
 UltimateLyricsProvider::UltimateLyricsProvider()
@@ -444,6 +309,123 @@ void UltimateLyricsProvider::lyricsFetched()
     } else {
         emit lyricsReady(id, lyrics);
     }
+}
+
+QString UltimateLyricsProvider::extract(const QString &source, const QString &begin, const QString &end, bool isTag)
+{
+    DBUG << "Looking for" << begin << end;
+    int beginIdx = source.indexOf(begin, 0, Qt::CaseInsensitive);
+    bool skipTagClose=false;
+
+    if (-1==beginIdx && isTag) {
+        beginIdx = source.indexOf(QString(begin).remove(">"), 0, Qt::CaseInsensitive);
+        skipTagClose=true;
+    }
+    if (-1==beginIdx) {
+        DBUG << "Failed to find begin";
+        return QString();
+    }
+    if (skipTagClose) {
+        int closeIdx=source.indexOf(">", beginIdx);
+        if (-1!=closeIdx) {
+            beginIdx=closeIdx+1;
+        } else {
+            beginIdx += begin.length();
+        }
+    } else {
+        beginIdx += begin.length();
+    }
+
+    int endIdx = source.indexOf(end, beginIdx, Qt::CaseInsensitive);
+    if (-1==endIdx && QLatin1String("null")!=end) {
+        DBUG << "Failed to find end";
+        return QString();
+    }
+
+    DBUG << "Found match";
+    return source.mid(beginIdx, endIdx - beginIdx - 1);
+}
+
+QString UltimateLyricsProvider::extractXmlTag(const QString &source, const QString &tag)
+{
+    DBUG << "Looking for" << tag;
+    QRegularExpressionMatch tag_match = tag_regexp.match(tag);
+    if (!tag_match.hasMatch()) {
+        DBUG << "Failed to find tag";
+        return QString();
+    }
+
+    DBUG << "Found match";
+    return extract(source, tag, "</" + tag_match.captured(1) + ">", true);
+}
+
+QString UltimateLyricsProvider::exclude(const QString &source, const QString &begin, const QString &end)
+{
+    DBUG << "Looking for" << begin << end;
+    int beginIdx = source.indexOf(begin, 0, Qt::CaseInsensitive);
+    if (-1==beginIdx) {
+        DBUG << "Failed to find begin";
+        return source;
+    }
+
+    int endIdx = source.indexOf(end, beginIdx + begin.length(), Qt::CaseInsensitive);
+    if (-1==endIdx) {
+        DBUG << "Failed to find end";
+        return source;
+    }
+
+    return source.left(beginIdx) + source.right(source.length() - endIdx - end.length());
+}
+
+QString UltimateLyricsProvider::excludeXmlTag(const QString &source, const QString &tag)
+{
+    QRegularExpressionMatch tag_match = tag_regexp.match(tag);
+    if (!tag_match.hasMatch()) {
+        return source;
+    }
+
+    return exclude(source, tag, "</" + tag_match.captured(1) + ">");
+}
+
+void UltimateLyricsProvider::applyExtractRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song)
+{
+    for (const UltimateLyricsProvider::RuleItem &item: rule) {
+        if (item.second.isNull()) {
+            content = extractXmlTag(content, doTagReplace(item.first, song));
+        } else {
+            content = extract(content, doTagReplace(item.first, song), doTagReplace(item.second, song));
+        }
+    }
+}
+
+void UltimateLyricsProvider::applyExcludeRule(const UltimateLyricsProvider::Rule &rule, QString &content, const Song &song)
+{
+    for (const UltimateLyricsProvider::RuleItem &item: rule) {
+        if (item.second.isNull()) {
+            content = excludeXmlTag(content, doTagReplace(item.first, song));
+        } else {
+            content = exclude(content, doTagReplace(item.first, song), doTagReplace(item.second, song));
+        }
+    }
+}
+
+bool UltimateLyricsProvider::tryWithoutThe(const Song &s)
+{
+    return 0==s.priority && s.basicArtist().startsWith(constThe);
+}
+
+QString UltimateLyricsProvider::doTagReplace(QString str, const Song &song)
+{
+    if (str.contains(u'{')) {
+        QString artistFixed=song.basicArtist();
+        str.replace(constArtistArg, artistFixed);
+        str.replace(constArtistFirstCharArg, firstChar(artistFixed));
+        str.replace(constAlbumArg, song.album);
+        str.replace(constTitleArg, song.basicTitle());
+        str.replace(constYearArg, QString::number(song.year));
+        str.replace(constTrackNoArg, QString::number(song.track));
+    }
+    return str;
 }
 
 void UltimateLyricsProvider::doUrlReplace(const QString &tag, const QString &value, QString &u) const

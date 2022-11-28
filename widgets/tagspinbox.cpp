@@ -22,12 +22,7 @@
  */
 
 #include "tagspinbox.h"
-#include <QPainter>
 #include <QLineEdit>
-
-static QString variousText;
-
-QString TagSpinBox::variousStr() { return variousText; }
 
 TagSpinBox::TagSpinBox(QWidget *parent)
     : EmptySpinBox(parent)

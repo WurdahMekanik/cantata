@@ -30,13 +30,14 @@ class TagSpinBox : public EmptySpinBox
 {
     Q_OBJECT
 public:
-    static QString variousStr();
+    static QString variousStr() { return variousText; }
 
     TagSpinBox(QWidget *parent);
     QSize sizeHint() const override;
     void setVarious(bool v);
 
 private:
+    inline static QString variousText;
     bool isVarious;
 };
 

@@ -67,12 +67,13 @@ void AlbumScanner::stop()
     }
 }
 
-static const QString constProgLine=QLatin1String("PROGRESS: ");
-static const QString constTrackLine=QLatin1String("TRACK: ");
-static const QString constAlbumLine=QLatin1String("ALBUM: ");
 
 void AlbumScanner::read()
 {
+    static const QString constProgLine = "PROGRESS: ";
+    static const QString constTrackLine = "TRACK: ";
+    static const QString constAlbumLine = "ALBUM: ";
+
     if (!proc) {
         return;
     }

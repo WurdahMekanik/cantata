@@ -219,7 +219,8 @@ private:
     int tabToIndex(int tab) const;
     int IndexToTab(int index) const { return index>=0 && index<items.count() ? items[index].index : 0; }
 
-private:
+    inline static int largeIconSize = 32;
+    inline static int smallIconSize = 16;
     int styleSetting;
     QList<Item> items;
     QWidget *tabBar;
