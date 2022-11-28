@@ -76,7 +76,7 @@ void AlbumScanner::read()
         return;
     }
 
-    QString output = proc->readAllStandardOutput().data();
+    QString output = proc->readAllStandardOutput();
     if (output.isEmpty()) {
         return;
     }

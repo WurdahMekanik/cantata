@@ -93,7 +93,7 @@ void TranscodingJob::processOutput()
         emit result(Device::Cancelled);
         return;
     }
-    QString output = process->readAllStandardOutput().data();
+    QString output = process->readAllStandardOutput();
     if(output.simplified().isEmpty()) {
         return;
     }
