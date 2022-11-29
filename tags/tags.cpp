@@ -273,8 +273,8 @@ static void setRva2Tag(TagLib::ID3v2::Tag *tag, const std::string &tagName, doub
 {
     TagLib::ID3v2::RelativeVolumeFrame *frame = nullptr;
     TagLib::ID3v2::FrameList frameList = tag->frameList("RVA2");
-    for (auto frame : frameList) {
-        TagLib::ID3v2::RelativeVolumeFrame *fr=dynamic_cast<TagLib::ID3v2::RelativeVolumeFrame*>(frame);
+    for (auto frameVal : frameList) {
+        TagLib::ID3v2::RelativeVolumeFrame *fr=dynamic_cast<TagLib::ID3v2::RelativeVolumeFrame*>(frameVal);
         if (fr && fr->identification() == tagName) {
             frame = fr;
             break;
