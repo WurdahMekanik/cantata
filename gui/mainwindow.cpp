@@ -26,7 +26,6 @@
 
 #include "mainwindow.h"
 #include "application.h"
-#include "qactiongroup.h"
 #include "support/thread.h"
 #include "trayitem.h"
 #include "support/messagebox.h"
@@ -50,6 +49,7 @@
 #include "searchpage.h"
 #include "customactions.h"
 #include "apikeys.h"
+#include "mediakeys.h"
 #include "widgets/mirrormenu.h"
 #ifdef ENABLE_DEVICES_SUPPORT
 #include "devices/devicespage.h"
@@ -117,7 +117,7 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QLocale>
-#include "mediakeys.h"
+#include <QActionGroup>
 #include <cstdlib>
 #include <algorithm>
 

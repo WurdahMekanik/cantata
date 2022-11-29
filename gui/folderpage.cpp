@@ -24,7 +24,6 @@
 #include "folderpage.h"
 #include "localfolderpage.h"
 #include "support/configuration.h"
-#include "widgets/icons.h"
 
 FolderPage::FolderPage(QWidget *p)
     : MultiPageWidget(p)

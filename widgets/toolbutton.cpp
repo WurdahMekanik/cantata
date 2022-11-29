@@ -23,9 +23,6 @@
 
 #include "toolbutton.h"
 #include "support/icon.h"
-#include "support/gtkstyle.h"
-#include "config.h"
-#include "support/utils.h"
 #include <QMenu>
 #include <QStylePainter>
 #include <QStyleOptionToolButton>

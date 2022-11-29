@@ -21,7 +21,6 @@
 #include "shortcutsmodel.h"
 #include "action.h"
 #include "actioncollection.h"
-#include "utils.h"
 #include <QCoreApplication>
 
 ShortcutsModel::ShortcutsModel(const QHash<QString, ActionCollection *> &actionCollections, QObject *parent)

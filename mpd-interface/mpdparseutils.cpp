@@ -43,7 +43,6 @@
 #endif
 #include "support/utils.h"
 #include "cuefile.h"
-#include "mpdconnection.h"
 #include <algorithm>
 
 #include <QDebug>

@@ -33,6 +33,7 @@
 #ifdef Q_OS_MAC
 #include "support/osxstyle.h"
 #endif
+#include "support/icon.h"
 #include "support/utils.h"
 #include "models/roles.h"
 #include <QStyledItemDelegate>

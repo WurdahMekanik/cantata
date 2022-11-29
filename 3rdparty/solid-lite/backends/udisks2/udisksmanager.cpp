@@ -19,6 +19,7 @@
 */
 
 #include "udisksmanager.h"
+#include "udisksdevice.h"
 #include "udisksdevicebackend.h"
 
 #include <QCoreApplication>

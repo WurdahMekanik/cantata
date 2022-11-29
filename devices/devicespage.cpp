@@ -23,11 +23,7 @@
 
 #include "devicespage.h"
 #include "models/musiclibraryitemroot.h"
-#include "models/musiclibraryitemartist.h"
-#include "models/musiclibraryitemalbum.h"
-#include "models/musiclibraryitemsong.h"
 #include "models/devicesmodel.h"
-#include "gui/settings.h"
 #include "support/messagebox.h"
 #include "support/configuration.h"
 #include "widgets/icons.h"
@@ -146,7 +142,6 @@ Device * DevicesPage::activeFsDevice() const
         return nullptr;
     }
 
-    QString udi;
     Device *activeDev=nullptr;
     for (const QModelIndex &idx: selected) {
         QModelIndex index = proxy.mapToSource(idx);

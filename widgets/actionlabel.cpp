@@ -23,6 +23,7 @@
 
 #include "actionlabel.h"
 #include "icons.h"
+#include "support/icon.h"
 #include <QLabel>
 #include <QTimer>
 #include <QPixmap>

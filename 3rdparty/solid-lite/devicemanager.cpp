@@ -28,8 +28,6 @@
 #include "ifaces/devicemanager.h"
 #include "ifaces/device.h"
 
-#include "soliddefs_p.h"
-
 Q_GLOBAL_STATIC(Solid::DeviceManagerStorage, globalDeviceStorage)
 
 #if QT_VERSION < 0x050000

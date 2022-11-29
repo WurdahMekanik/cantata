@@ -23,14 +23,12 @@
 
 #include "mpdbrowsepage.h"
 #include "mpd-interface/mpdconnection.h"
-#include "settings.h"
+#include "support/configuration.h"
 #include "support/messagebox.h"
 #include "support/action.h"
 #include "support/utils.h"
 #include "support/monoicon.h"
-#include "models/mpdlibrarymodel.h"
 #include "widgets/menubutton.h"
-#include "widgets/icons.h"
 #include "stdactions.h"
 #include "customactions.h"
 #include <QDesktopServices>
@@ -189,7 +187,6 @@ QStringList MpdBrowsePage::selectedFiles(bool allowPlaylists) const
 void MpdBrowsePage::addSelectionToPlaylist(const QString &name, int action, quint8 priority, bool decreasePriority)
 {
     QModelIndexList selected=view->selectedIndexes();
-    QStringList dirs;
     QStringList files;
 
     for (const QModelIndex &idx: selected) {

@@ -609,7 +609,6 @@ void CoverDownloader::download(const Song &song)
 {
     DBUG << song.file << song.artist << song.albumartist << song.album;
     if (song.isFromOnlineService()) {
-        QString serviceName=song.onlineService();
         QString imageUrl=song.extraField(Song::OnlineImageUrl);
 
         Job job(song, QString());

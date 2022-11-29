@@ -22,13 +22,11 @@
  */
 
 #include "settings.h"
-#include "models/sqllibrarymodel.h"
 #include "support/fancytabwidget.h"
 #include "widgets/itemview.h"
 #include "mpd-interface/mpdparseutils.h"
 #include "support/utils.h"
 #include "support/globalstatic.h"
-#include "db/librarydb.h"
 #include <QFile>
 #include <QDir>
 #include <qglobal.h>
@@ -293,7 +291,6 @@ QString Settings::coverFilename()
     // name is empty, so for old configs try to get from MPD settings
     if (name.isEmpty() && version()<CANTATA_MAKE_VERSION(2, 2, 51)) {
         QStringList groups=cfg.childGroups();
-        QList<MPDConnectionDetails> connections;
         for (const QString &grp: groups) {
             if (cfg.hasGroup(grp) && grp.startsWith("Connection")) {
                 Configuration cfg(grp);

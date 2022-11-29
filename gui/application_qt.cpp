@@ -23,6 +23,7 @@
 
 #include "application_qt.h"
 #include "config.h"
+#include "support/utils.h"
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDir>

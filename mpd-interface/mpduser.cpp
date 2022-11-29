@@ -22,9 +22,7 @@
  */
 
 #include "mpduser.h"
-#include "config.h"
 #include "support/utils.h"
-#include "gui/settings.h"
 #include "support/globalstatic.h"
 #include <QTextStream>
 #include <QProcess>
@@ -204,7 +202,6 @@ void MPDUser::cleanup()
     if (cfgFile.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QStringList fileKeys=QStringList() << constPidKey << constSocketKey << QLatin1String("db_file")
                                            << QLatin1String("state_file") << QLatin1String("sticker_file");
-        QStringList dirKeys=QStringList() << constPlaylistsKey;
         while (!cfgFile.atEnd()) {
             QString line = QString::fromUtf8(cfgFile.readLine());
             for (const QString &key: fileKeys) {

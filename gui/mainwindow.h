@@ -27,7 +27,7 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
-#include <qglobal.h>
+#include <QtGlobal>
 #include <QMainWindow>
 #include <QToolButton>
 #include <QStringList>

@@ -22,6 +22,7 @@
  */
 
 #include "searchwidget.h"
+#include "support/icon.h"
 #include "support/monoicon.h"
 #include "support/utils.h"
 #include "toolbutton.h"

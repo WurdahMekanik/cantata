@@ -29,12 +29,9 @@
 #include "widgets/icons.h"
 #include "gui/stdactions.h"
 #include "gui/customactions.h"
-#include "support/actioncollection.h"
 #include "support/configuration.h"
 #include "widgets/tableview.h"
-#include "widgets/spacerwidget.h"
 #include "widgets/menubutton.h"
-#include "gui/settings.h"
 #include <QMenu>
 #include <QStyle>
 

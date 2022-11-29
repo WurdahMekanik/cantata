@@ -25,7 +25,6 @@
 #define TOOLBUTTON_H
 
 #include <QToolButton>
-#include "support/icon.h"
 
 class QMenu;
 class ToolButton : public QToolButton

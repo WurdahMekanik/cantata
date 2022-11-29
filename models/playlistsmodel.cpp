@@ -27,7 +27,6 @@
 #include <QModelIndex>
 #include <QMimeData>
 #include <QFont>
-#include "config.h"
 #include "playlistsmodel.h"
 #include "playlistsproxymodel.h"
 #include "playqueuemodel.h"
@@ -39,14 +38,10 @@
 #include "support/monoicon.h"
 #include "support/globalstatic.h"
 #include "mpd-interface/mpdparseutils.h"
-#include "mpd-interface/mpdstats.h"
 #include "mpd-interface/mpdconnection.h"
 #include "playqueuemodel.h"
 #include "widgets/icons.h"
 #include "widgets/mirrormenu.h"
-#ifdef ENABLE_HTTP_SERVER
-#include "http/httpserver.h"
-#endif
 #include <algorithm>
 
 QString PlaylistsModel::headerText(int col)

@@ -24,9 +24,9 @@
 #include "playlistrulesdialog.h"
 #include "playlistruledialog.h"
 #include "support/messagebox.h"
+#include "support/utils.h"
 #include "widgets/basicitemdelegate.h"
 #include "widgets/icons.h"
-#include <QIcon>
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>

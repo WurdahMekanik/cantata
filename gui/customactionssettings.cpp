@@ -24,8 +24,8 @@
 #include "customactionssettings.h"
 #include "customactions.h"
 #include "support/messagebox.h"
+#include "support/utils.h"
 #include "widgets/basicitemdelegate.h"
-#include "widgets/icons.h"
 #include "widgets/notelabel.h"
 #include <QGridLayout>
 #include <QFormLayout>

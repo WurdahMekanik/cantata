@@ -16,7 +16,6 @@
  */
 
 #include "findmpddialog.h"
-#include "support/utils.h"
 #include <QPushButton>
 #include <QScreen>
 
@@ -68,7 +67,6 @@ void FindMpdDialog::okClicked()
     QItemSelectionModel *selection = tableWidget->selectionModel();
 
     if (selection->hasSelection()) {
-        QModelIndexList indexList = selection->selectedRows();
         QModelIndex addressIndex = selection->selectedRows(1).first();
         QModelIndex portIndex = selection->selectedRows(2).first();
 

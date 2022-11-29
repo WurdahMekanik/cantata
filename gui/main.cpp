@@ -32,7 +32,6 @@
 #include "settings.h"
 #include "initialsettingswizard.h"
 #include "mainwindow.h"
-#include "mpd-interface/song.h"
 #include "support/thread.h"
 #include "db/librarydb.h"
 

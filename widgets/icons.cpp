@@ -22,13 +22,9 @@
  */
 
 #include "icons.h"
-#include "gui/settings.h"
 #include "support/globalstatic.h"
 #include "support/utils.h"
 #include "support/monoicon.h"
-#if !defined Q_OS_WIN && !defined Q_OS_MAC
-#include "support/gtkstyle.h"
-#endif
 #ifdef Q_OS_MAC
 #include "support/osxstyle.h"
 #endif
@@ -152,7 +148,9 @@ void Icons::initToolbarIcons(const QColor &toolbarText)
 
 const QIcon & Icons::albumIcon(int size, bool mono) const
 {
-    return !mono || albumMonoIcon.isNull()
-                ? size<48 ? albumIconSmall : albumIconLarge
+    return (!mono || albumMonoIcon.isNull())
+                ? (size < 48)
+                    ? albumIconSmall
+                    : albumIconLarge
                 : albumMonoIcon;
 }

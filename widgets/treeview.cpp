@@ -22,12 +22,10 @@
  */
 
 #include "treeview.h"
-#include "models/roles.h"
 #include "icons.h"
-#include "config.h"
-#include "basicitemdelegate.h"
+#include "support/icon.h"
 #include "support/utils.h"
-#include "mpd-interface/song.h"
+#include "basicitemdelegate.h"
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QPainter>

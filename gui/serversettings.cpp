@@ -23,7 +23,6 @@
 
 #include "serversettings.h"
 #include "settings.h"
-#include "support/inputdialog.h"
 #include "support/messagebox.h"
 #include "widgets/icons.h"
 #include "db/mpdlibrarydb.h"

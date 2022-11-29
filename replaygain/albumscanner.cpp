@@ -23,6 +23,7 @@
 
 #include "albumscanner.h"
 #include "config.h"
+#include "support/utils.h"
 #include <QProcess>
 #include <QApplication>
 

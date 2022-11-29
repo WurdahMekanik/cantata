@@ -33,7 +33,6 @@
 #include "gui/settings.h"
 #include "network/networkaccessmanager.h"
 #include "wikipediaengine.h"
-#include "support/gtkstyle.h"
 #include "widgets/playqueueview.h"
 #include "widgets/treeview.h"
 #include "widgets/thinsplitterhandle.h"

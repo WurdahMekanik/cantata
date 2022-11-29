@@ -31,7 +31,6 @@
 #include "network/networkaccessmanager.h"
 #include "support/configuration.h"
 #include "support/monoicon.h"
-#include "gui/settings.h"
 #include "widgets/menubutton.h"
 #include "widgets/itemview.h"
 #include "models/playqueuemodel.h"

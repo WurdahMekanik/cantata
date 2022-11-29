@@ -25,7 +25,6 @@
 #include "tags.h"
 #include "widgets/tagspinbox.h"
 #include "mpd-interface/mpdconnection.h"
-#include "gui/settings.h"
 #include "support/messagebox.h"
 #include "support/inputdialog.h"
 #include "trackorganiser.h"

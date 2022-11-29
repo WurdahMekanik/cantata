@@ -24,14 +24,12 @@
 #include "coverdialog.h"
 #include "apikeys.h"
 #include "support/messagebox.h"
-#include "widgets/listview.h"
 #include "network/networkaccessmanager.h"
 #include "settings.h"
 #include "mpd-interface/mpdconnection.h"
 #include "support/utils.h"
 #include "support/spinner.h"
 #include "widgets/messageoverlay.h"
-#include "support/icon.h"
 #include "widgets/icons.h"
 #include <QGuiApplication>
 #include <QVBoxLayout>

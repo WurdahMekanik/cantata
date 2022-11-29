@@ -218,24 +218,20 @@ void StorageAccess::slotDBusReply(const QDBusMessage &/*reply*/)
             QString devnode = m_device->prop("block.device").toString();
 
 #if defined(Q_OS_OPENBSD)
-            QString program = "cdio";
             QStringList args;
             args << "-f" << devnode << "eject";
 #elif defined(Q_OS_FREEBSD) || defined(Q_OS_NETBSD)
             devnode.remove("/dev/").replace("([0-9]).", "\\1");
-            QString program = "cdcontrol";
             QStringList args;
             args << "-f" << devnode << "eject";
 #else
-            QString program = "eject";
             QStringList args;
             args << devnode;
 #endif
 
             m_ejectInProgress = true;
             m_device->broadcastActionRequested("eject");
-            m_process = FstabHandling::callSystemCommand("eject", args,
-                                                         this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
+            m_process = FstabHandling::callSystemCommand("eject", args, this, SLOT(slotProcessFinished(int,QProcess::ExitStatus)));
         }
     } else if (m_ejectInProgress) {
         m_ejectInProgress = false;
@@ -248,16 +244,13 @@ void StorageAccess::slotDBusError(const QDBusError &error)
     // TODO: Better error reporting here
     if (m_setupInProgress) {
         m_setupInProgress = false;
-        m_device->broadcastActionDone("setup", Solid::UnauthorizedOperation,
-                                      QString(error.name()+": "+error.message()));
+        m_device->broadcastActionDone("setup", Solid::UnauthorizedOperation, QString(error.name()+": "+error.message()));
     } else if (m_teardownInProgress) {
         m_teardownInProgress = false;
-        m_device->broadcastActionDone("teardown", Solid::UnauthorizedOperation,
-                                      QString(error.name()+": "+error.message()));
+        m_device->broadcastActionDone("teardown", Solid::UnauthorizedOperation, QString(error.name()+": "+error.message()));
     } else if (m_ejectInProgress) {
         m_ejectInProgress = false;
-        m_device->broadcastActionDone("eject", Solid::UnauthorizedOperation,
-                                      QString(error.name()+": "+error.message()));
+        m_device->broadcastActionDone("eject", Solid::UnauthorizedOperation, QString(error.name()+": "+error.message()));
     }
 }
 

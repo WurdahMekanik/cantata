@@ -32,7 +32,6 @@
 #include "models/devicesmodel.h"
 #include "support/messagebox.h"
 #include "support/squeezedtextlabel.h"
-#include "widgets/icons.h"
 #include <QSplitter>
 #include <QFileInfo>
 

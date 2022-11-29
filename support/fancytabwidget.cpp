@@ -35,7 +35,6 @@
 
 #include "fancytabwidget.h"
 #include "icon.h"
-#include "action.h"
 #include "utils.h"
 #include "config.h"
 #ifdef Q_OS_MAC

@@ -23,7 +23,6 @@
 
 #include "nowplayingwidget.h"
 #include "ratingwidget.h"
-#include "volumeslider.h"
 #include "mpd-interface/song.h"
 #include "gui/settings.h"
 #include "support/actioncollection.h"

@@ -23,7 +23,6 @@
 #define UDISKS2MANAGER_H
 
 #include "udisks2.h"
-#include "udisksdevice.h"
 #include "dbus/manager.h"
 
 #include "solid-lite/ifaces/devicemanager.h"

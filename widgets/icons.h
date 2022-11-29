@@ -24,7 +24,7 @@
 #ifndef ICONS_H
 #define ICONS_H
 
-#include "support/icon.h"
+#include <QIcon>
 #include "config.h"
 
 class Icons
