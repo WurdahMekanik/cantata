@@ -65,7 +65,7 @@ Solid::DeviceManagerPrivate::~DeviceManagerPrivate()
         disconnect(backend, nullptr, this, nullptr);
     }
 
-    for (const QtPointer<DevicePrivate> &dev: m_devicesMap) {
+    for (const QtPointer<DevicePrivate> &dev: qAsConst(m_devicesMap)) {
         if (dev.data() && !dev.data()->ref.deref()) {
             dev.data()->deleteLater();
         }
@@ -157,7 +157,7 @@ QList<Solid::Device> Solid::Device::listFromQuery(const Predicate &predicate,
             udis+= listToSet(backend->allDevices());
         }
 
-        for (const QString &udi: udis)
+        for (const QString &udi: qAsConst(udis))
         {
             Device dev(udi);
 

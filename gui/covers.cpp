@@ -1502,7 +1502,7 @@ bool Covers::updateCache(const Song &song, const QImage &img, bool dummyEntriesO
     #endif
     bool updated=false;
 
-    for (int s: cacheSizes) {
+    for (int s: qAsConst(cacheSizes)) {
         QString key=cacheKey(song, s);
         QPixmap *pix(cache.object(key));
 

@@ -1153,7 +1153,7 @@ bool TagEditor::applyUpdates()
     int count=0;
     bool someTimedout=false;
     bool isLocal=false;
-    for (int idx: editedIndexes) {
+    for (int idx: qAsConst(editedIndexes)) {
         progress->setValue(progress->value()+1);
 
         if (0==count++%10) {

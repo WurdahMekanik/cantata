@@ -276,7 +276,7 @@ Solid::DevicePrivate::DevicePrivate(const QString &udi)
 
 Solid::DevicePrivate::~DevicePrivate()
 {
-    for (DeviceInterface *iface: m_ifaces) {
+    for (DeviceInterface *iface: qAsConst(m_ifaces)) {
         delete iface->d_ptr->backendObject();
     }
     setBackendObject(nullptr);
@@ -304,7 +304,7 @@ void Solid::DevicePrivate::setBackendObject(Ifaces::Device *object)
     }
 
     if (!m_ifaces.isEmpty()) {
-        for (DeviceInterface *iface: m_ifaces) {
+        for (DeviceInterface *iface: qAsConst(m_ifaces)) {
             delete iface;
         }
 

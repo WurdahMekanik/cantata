@@ -765,7 +765,7 @@ void CoverDialog::checkStatus()
 
 void CoverDialog::cancelQuery()
 {
-    for (NetworkJob *job: currentQuery) {
+    for (NetworkJob *job: qAsConst(currentQuery)) {
         job->cancelAndDelete();
     }
     currentQuery.clear();

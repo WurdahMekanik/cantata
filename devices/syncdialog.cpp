@@ -83,7 +83,7 @@ static void getDiffs(const QSet<Song> &s1, const QSet<Song> &s2, QSet<Song> &in1
 
     r=b-a;
 
-    for (const Song &s: r) {
+    for (const Song &s: qAsConst(r)) {
         in2.insert(s);
     }
 }

@@ -152,7 +152,7 @@ StreamsBrowsePage::StreamsBrowsePage(QWidget *p)
 
 StreamsBrowsePage::~StreamsBrowsePage()
 {
-    for (NetworkJob *job: resolveJobs) {
+    for (NetworkJob *job: qAsConst(resolveJobs)) {
         disconnect(job, SIGNAL(finished()), this, SLOT(tuneInResolved()));
         job->deleteLater();
     }

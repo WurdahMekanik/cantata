@@ -2289,7 +2289,7 @@ void MainWindow::addStreamToPlayQueue()
 void MainWindow::addLocalFilesToPlayQueue()
 {
     QString extensions;
-    for (const auto &ext: PlayQueueModel::constFileExtensions) {
+    for (const auto &ext: qAsConst(PlayQueueModel::constFileExtensions)) {
         if (!extensions.isEmpty()) {
             extensions+=" ";
         }

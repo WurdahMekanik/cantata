@@ -423,7 +423,7 @@ void Song::setIgnorePrefixes(const QSet<QString> &prefixes)
 
 static QString ignorePrefix(const QString &str)
 {
-    for (const QString &p: prefixesToIngore) {
+    for (const QString &p: qAsConst(prefixesToIngore)) {
         if (str.startsWith(p+QLatin1Char(' '))) {
             return str.mid(p.length()+1)+QLatin1String(", ")+p;
         }
