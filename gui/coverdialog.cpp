@@ -407,7 +407,7 @@ void CoverDialog::show(const Song &s, const Covers::Image &current)
     } else if (isComposer) {
         setCaption(tr("'%1' Composer Image").arg(song.albumArtist()));
     } else {
-        setCaption(tr("'%1 - %2' Album Cover", "'Artist - Album' Album Cover").arg(song.albumArtist()).arg(song.album));
+        setCaption(tr("'%1 - %2' Album Cover", "'Artist - Album' Album Cover").arg(song.albumArtist(), song.album));
     }
     if (!img.img.isNull()) {
         existing=new ExistingCover(isArtist || isComposer ? Covers::Image(cropImage(img.img, true), img.fileName) : img, list);

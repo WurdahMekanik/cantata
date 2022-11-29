@@ -519,7 +519,7 @@ void DevicesPage::toggleDevice()
         Device *dev=static_cast<Device *>(item);
         if (dev->isConnected() &&
             (Device::AudioCd==dev->devType()
-                ? MessageBox::No==MessageBox::warningYesNo(this, tr("Are you sure you wish to eject Audio CD '%1 - %2'?").arg(dev->data()).arg(dev->subText()),
+                ? MessageBox::No==MessageBox::warningYesNo(this, tr("Are you sure you wish to eject Audio CD '%1 - %2'?").arg(dev->data(), dev->subText()),
                                                            tr("Eject"), GuiItem(tr("Eject")), StdGuiItem::cancel())
                 : MessageBox::No==MessageBox::warningYesNo(this, tr("Are you sure you wish to disconnect '%1'?").arg(dev->data()),
                                                            tr("Disconnect"), GuiItem(tr("Disconnect")), StdGuiItem::cancel()))) {

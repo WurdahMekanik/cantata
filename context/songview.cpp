@@ -362,7 +362,6 @@ void SongView::loadLyrics()
     lyricsNeedsUpdating=false;
 
     if (currentSong.isCantataStream() || (!MPDConnection::self()->getDetails().dir.isEmpty() && !currentSong.file.isEmpty() && !currentSong.isNonMPD())) {
-        QString songFile=currentSong.filePath(MPDConnection::self()->getDetails().dir);
         QString mpdLyrics=mpdLyricsFilePath(currentSong);
 
         if (!currentSong.isCantataStream() && MPDConnection::self()->getDetails().dir.startsWith(QLatin1String("http:/"))) {
@@ -478,11 +477,14 @@ static QString createRow(const QString &key, const QString &value, bool htmlEsca
 {
     return value.isEmpty()
             ? QString()
-            : QString("<tr><td>%1:&nbsp;</td><td>%2</td></tr>").arg(key).arg(fixNewLine(htmlEscape ? value.toHtmlEscaped() : value));
+            : QString("<tr><td>%1:&nbsp;</td><td>%2</td></tr>").arg(key, (fixNewLine(htmlEscape ? value.toHtmlEscaped() : value)));
 }
 
 struct MapEntry {
-    MapEntry(int v=0, const QString &s=QString()) : val(v), str(s) { }
+    MapEntry(int v=0, const QString &s=QString())
+        : val(v)
+        , str(s)
+    { }
     int val;
     QString str;
 };

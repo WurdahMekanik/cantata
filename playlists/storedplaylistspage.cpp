@@ -340,7 +340,7 @@ void StoredPlaylistsPage::addItemsToPlayList(const QModelIndexList &indexes, con
             PlaylistsModel::Item *item=static_cast<PlaylistsModel::Item *>(m.internalPointer());
             if ( (item->isPlaylist() && static_cast<PlaylistsModel::PlaylistItem *>(item)->name==name) ||
                  (!item->isPlaylist() && static_cast<PlaylistsModel::SongItem *>(item)->parent->name==name) ) {
-                MessageBox::error(this, tr("Cannot add songs from '%1' to '%2'").arg(name).arg(name));
+                MessageBox::error(this, tr("Cannot add songs from '%1' to '%2'").arg(name, name));
                 return;
             }
         }

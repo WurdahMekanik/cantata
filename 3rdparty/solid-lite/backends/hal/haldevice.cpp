@@ -619,9 +619,9 @@ QString HalDevice::storageDescription() const
             second = QObject::tr("/HD DVD-RW", "Second item of %1%2 Drive sentence");
 
         if (drive_is_hotpluggable) {
-            description = QObject::tr("External %1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first).arg(second);
+            description = QObject::tr("External %1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first, second);
         } else {
-            description = QObject::tr("%1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first).arg(second);
+            description = QObject::tr("%1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first, second);
         }
 
         return description;
@@ -667,7 +667,7 @@ QString HalDevice::storageDescription() const
         if (model.isEmpty())
             vendormodel_str = vendor;
         else
-            vendormodel_str = QObject::tr("%1 %2", "%1 is the vendor, %2 is the model of the device").arg(vendor).arg(model);
+            vendormodel_str = QObject::tr("%1 %2", "%1 is the vendor, %2 is the model of the device").arg(vendor, model);
     }
 
     if (vendormodel_str.isEmpty())

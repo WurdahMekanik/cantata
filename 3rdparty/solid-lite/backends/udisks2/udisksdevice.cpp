@@ -322,9 +322,9 @@ QString Device::storageDescription() const
             second = QCoreApplication::translate("", "/HD DVD-RW", "Second item of %1%2 Drive sentence");
 
         if (drive_is_hotpluggable)
-            description = QCoreApplication::translate("", "External %1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first).arg(second);
+            description = QCoreApplication::translate("", "External %1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first, second);
         else
-            description = QCoreApplication::translate("", "%1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first).arg(second);
+            description = QCoreApplication::translate("", "%1%2 Drive", "%1 is CD-ROM/CD-R/etc; %2 is '/DVD-ROM'/'/DVD-R'/etc (with leading slash)").arg(first, second);
 
         return description;
     }
@@ -382,7 +382,7 @@ QString Device::storageDescription() const
             }
             else
             {
-                vendormodel_str = QCoreApplication::translate("", "%1 %2", "%1 is the vendor, %2 is the model of the device").arg(vendor_str).arg(model);
+                vendormodel_str = QCoreApplication::translate("", "%1 %2", "%1 is the vendor, %2 is the model of the device").arg(vendor_str, model);
             }
         }
     }

@@ -600,7 +600,7 @@ QString Song::trackAndTitleStr(bool showArtistIfDifferent) const
 static void addField(const QString &name, const QString &val, QString &tt)
 {
     if (!val.isEmpty()) {
-        tt+=QString("<tr><td align=\"right\"><b>%1:&nbsp;&nbsp;</b></td><td>%2</td></tr>").arg(name).arg(val);
+        tt+=QString("<tr><td align=\"right\"><b>%1:&nbsp;&nbsp;</b></td><td>%2</td></tr>").arg(name, val);
     }
 }
 #endif
@@ -871,8 +871,8 @@ QString Song::describe() const
         return QLatin1String("<b>")+albumText+QLatin1String("</b>");
     }
     return artist.isEmpty()
-                    ? QObject::tr("<b>%1</b> on <b>%2</b>", "Song on Album").arg(title).arg(albumText)
-                    : QObject::tr("<b>%1</b> by <b>%2</b> on <b>%3</b>", "Song by Artist on Album").arg(title).arg(artist).arg(albumText);
+                    ? QObject::tr("<b>%1</b> on <b>%2</b>", "Song on Album").arg(title, albumText)
+                    : QObject::tr("<b>%1</b> by <b>%2</b> on <b>%3</b>", "Song by Artist on Album").arg(title, artist, albumText);
 }
 
 QString Song::mainText() const
