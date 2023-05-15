@@ -1,11 +1,13 @@
 .project
 .vscode/
-build/
+.ccls-cache/
+.cmake/
 CMakeLists.txt.user*
 cmake_install.cmake
 CMakeFiles/
 .qt*
 *_autogen/
+build/
 build-cantata*
 
 *.a
