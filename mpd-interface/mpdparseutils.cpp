@@ -405,7 +405,7 @@ Song MPDParseUtils::parseSong(const QList<QByteArray> &lines, Location location)
             if (song.file.contains(Song::constCddaProtocol)) {
                 song.type=Song::Cdda;
             } else if (song.file.contains(constProtocol)) {
-                for (const QString &protocol: qAsConst(constStdProtocols)) {
+                for (const QString &protocol: std::as_const(constStdProtocols)) {
                     if (song.file.startsWith(protocol)) {
                         song.type=Song::Stream;
                         break;

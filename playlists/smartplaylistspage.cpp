@@ -193,7 +193,7 @@ void SmartPlaylistsPage::filterCommand()
     if (filterDuration || filterAge) {
         uint maxAge=time(nullptr)-(command.maxAge*24*60*60);
         QSet<Song> toRemove;
-        for (const auto &s: qAsConst(command.songs)) {
+        for (const auto &s: std::as_const(command.songs)) {
             if ((filterAge && s.lastModified<maxAge) ||
                 (filterDuration && ((command.minDuration>s.time || (command.maxDuration>0 && s.time>command.maxDuration))) ) ) {
                 toRemove.insert(s);
@@ -211,7 +211,7 @@ void SmartPlaylistsPage::filterCommand()
 
     if (command.filterRating || command.fetchRatings || command.includeUnrated) {
         if (command.toCheck.isEmpty()) {
-            for (const auto &s: qAsConst(command.songs)) {
+            for (const auto &s: std::as_const(command.songs)) {
                 command.toCheck.append(s.file);
             }
         }
@@ -228,7 +228,7 @@ void SmartPlaylistsPage::rating(const QString &file, quint8 val)
         return;
     }
 
-    for (auto &s: qAsConst(command.songs)) {
+    for (auto &s: std::as_const(command.songs)) {
         if (s.file==file) {
             s.rating=val;
             if (command.filterRating && (val<command.ratingFrom || val>command.ratingTo) &&
@@ -429,7 +429,7 @@ void SmartPlaylistsPage::addSelectionToPlaylist(const QString &name, int action,
                     if (mpdGenres.isEmpty()) {
                         mpdGenres = MpdLibraryModel::self()->getGenres();
                     }
-                    for (const QString &g: qAsConst(mpdGenres)) {
+                    for (const QString &g: std::as_const(mpdGenres)) {
                         if (g.startsWith(find, Qt::CaseInsensitive)) {
                             genres.append(g);
                         }

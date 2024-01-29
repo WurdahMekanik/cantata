@@ -179,7 +179,7 @@ static QString parse(const QByteArray &data, const QString &host)
         DBUG << "ext3mu/2";
         return parseExt3Mu(data, handlers);
     } else {
-        for (const auto &h: qAsConst(handlers)) {
+        for (const auto &h: std::as_const(handlers)) {
             DBUG << h;
             if (data.startsWith(h.toLatin1()+"://")) {
                 QStringList lines=QString(data).split(endlineRegexp, CANTATA_SKIP_EMPTY);

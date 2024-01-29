@@ -435,7 +435,7 @@ void ArtistView::buildSimilar(const QStringList &artists)
         if (artistLink.isEmpty()) {
             // ...and check case-insensitively...
             if (mpdLowerArtists.isEmpty()) {
-                for (const QString &a: qAsConst(mpdArtists)) {
+                for (const QString &a: std::as_const(mpdArtists)) {
                     mpdLowerArtists.insert(a.toLower());
                 }
             }

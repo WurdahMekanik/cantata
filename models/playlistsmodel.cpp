@@ -765,7 +765,7 @@ void PlaylistsModel::setPlaylists(const QList<Playlist> &playlists)
         added=retreived-existing;
 
         if (removed.count()) {
-            for (const QString &p: qAsConst(removed)) {
+            for (const QString &p: std::as_const(removed)) {
                 PlaylistItem *pl=getPlaylist(p);
                 if (pl) {
                     int index=items.indexOf(pl);
@@ -779,7 +779,7 @@ void PlaylistsModel::setPlaylists(const QList<Playlist> &playlists)
         }
         if (added.count()) {
             beginInsertRows(parent, items.count(), items.count()+added.count()-1);
-            for (const QString &p: qAsConst(added)) {
+            for (const QString &p: std::as_const(added)) {
                 int idx=playlists.indexOf(Playlist(p));
                 if (-1!=idx) {
                     items.append(new PlaylistItem(playlists.at(idx), allocateKey()));

@@ -1153,7 +1153,7 @@ bool TagEditor::applyUpdates()
     int count=0;
     bool someTimedout=false;
     bool isLocal=false;
-    for (int idx: qAsConst(editedIndexes)) {
+    for (int idx: std::as_const(editedIndexes)) {
         progress->setValue(progress->value()+1);
 
         if (0==count++%10) {

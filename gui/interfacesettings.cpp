@@ -420,7 +420,7 @@ void InterfaceSettings::showEvent(QShowEvent *e)
         transCodes+=translationCodes(CANTATA_SYS_TRANS_DIR);
         #endif
 
-        for (const QString &code: qAsConst(transCodes)) {
+        for (const QString &code: std::as_const(transCodes)) {
             QString langName = QLocale::languageToString(QLocale(code).language());
             QString nativeName = QLocale(code).nativeLanguageName();
             if (!nativeName.isEmpty()) {

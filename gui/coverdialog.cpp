@@ -765,7 +765,7 @@ void CoverDialog::checkStatus()
 
 void CoverDialog::cancelQuery()
 {
-    for (NetworkJob *job: qAsConst(currentQuery)) {
+    for (NetworkJob *job: std::as_const(currentQuery)) {
         job->cancelAndDelete();
     }
     currentQuery.clear();

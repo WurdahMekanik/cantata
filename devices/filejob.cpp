@@ -229,7 +229,7 @@ void CleanJob::run()
 {
     int total=dirs.count();
     int current=0;
-    for (const QString &d: qAsConst(dirs)) {
+    for (const QString &d: std::as_const(dirs)) {
         if (stopRequested) {
             emit result(Device::Cancelled);
             return;

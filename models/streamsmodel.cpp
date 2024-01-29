@@ -1003,7 +1003,7 @@ void StreamsModel::jobFinished()
         // ShoutCast has two jobs when listing a category - child categories and station list.
         // So, only set as fetched if both are finished.
         bool haveOtherJob=false;
-        for (CategoryItem *c: qAsConst(jobs)) {
+        for (CategoryItem *c: std::as_const(jobs)) {
             if (c==cat) {
                 haveOtherJob=true;
                 break;
