@@ -33,6 +33,7 @@
 #include "gui/stdactions.h"
 #include "models/mpdlibrarymodel.h"
 #include <algorithm>
+#include <random>
 
 SmartPlaylistsPage::SmartPlaylistsPage(QWidget *p)
     : SinglePageWidget(p)
@@ -353,7 +354,9 @@ void SmartPlaylistsPage::addSongsToPlayQueue()
         break;
     default:
     case RulesPlaylists::Order_Random:
-        std::random_shuffle(songs.begin(), songs.end());
+        std::random_device rd;
+        std::default_random_engine g(rd());
+        std::shuffle(songs.begin(), songs.end(), g);
     }
 
     QStringList files;
