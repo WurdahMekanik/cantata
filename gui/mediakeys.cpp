@@ -22,9 +22,6 @@
  */
 
 #include "mediakeys.h"
-#ifdef QT_QTDBUS_FOUND
-#include "dbus/gnomemediakeys.h"
-#endif
 #ifdef CANTATA_USE_QXT_MEDIAKEYS
 #include "qxtmediakeys.h"
 #endif
@@ -43,10 +40,6 @@ GLOBAL_STATIC(MediaKeys, instance)
 
 MediaKeys::MediaKeys()
 {
-    #ifdef QT_QTDBUS_FOUND
-    gnome=nullptr;
-    #endif
-
     #ifdef CANTATA_USE_QXT_MEDIAKEYS
     qxt=0;
     #endif
@@ -59,26 +52,10 @@ MediaKeys::~MediaKeys()
         delete qxt;
     }
     #endif
-    #ifdef QT_QTDBUS_FOUND
-    if (gnome) {
-        delete gnome;
-    }
-    #endif
 }
 
 void MediaKeys::start()
 {
-    #ifdef QT_QTDBUS_FOUND
-    gnome=new GnomeMediaKeys(nullptr);
-    if (activate(gnome)) {
-        DBUG << "Using Gnome";
-        return;
-    }
-    DBUG << "Gnome failed";
-    gnome->deleteLater();
-    gnome=nullptr;
-    #endif
-
     #ifdef CANTATA_USE_QXT_MEDIAKEYS
     qxt=new QxtMediaKeys(0);
     if (activate(qxt)) {
@@ -94,14 +71,6 @@ void MediaKeys::start()
 
 void MediaKeys::stop()
 {
-    #ifdef QT_QTDBUS_FOUND
-    if (gnome) {
-        deactivate(gnome);
-        gnome->deleteLater();
-        gnome=nullptr;
-    }
-    #endif
-
     #ifdef CANTATA_USE_QXT_MEDIAKEYS
     if (qxt) {
         deactivate(qxt);

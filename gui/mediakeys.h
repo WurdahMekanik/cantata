@@ -27,7 +27,6 @@
 #include <qglobal.h>
 #include "config.h"
 
-class GnomeMediaKeys;
 class QxtMediaKeys;
 class MultiMediaKeysInterface;
 
@@ -52,9 +51,6 @@ private:
     void deactivate(MultiMediaKeysInterface *iface);
 
 private:
-    #ifdef QT_QTDBUS_FOUND
-    GnomeMediaKeys *gnome;
-    #endif
     #ifdef CANTATA_USE_QXT_MEDIAKEYS
     QxtMediaKeys *qxt;
     #endif
